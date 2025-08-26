@@ -23,6 +23,7 @@ tasks.withType(JavaCompile).configureEach {
 publishing {
     publications {
         maven(MavenPublication) {
+            from components.java
         }
     }
 }
