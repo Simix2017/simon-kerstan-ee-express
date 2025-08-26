@@ -1,0 +1,46 @@
+plugins {
+    id 'java-library'
+    id('io.freefair.lombok') version '8.14'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+    api 'jakarta.ws.rs:jakarta.ws.rs-api:4.0.0'
+
+    implementation project(':ee-express-core')
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.10'
+    implementation 'org.glassfish.jersey.containers:jersey-container-servlet:3.1.11'
+
+    runtimeOnly 'org.glassfish.jersey.inject:jersey-hk2:3.1.11'
+    runtimeOnly 'org.glassfish.jersey.media:jersey-media-json-binding:3.1.11'
+    runtimeOnly 'org.glassfish.jersey.media:jersey-media-jaxb:3.1.11'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:5.19.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(Test).configureEach {
+    def mockitoAgent = configurations.testRuntimeClasspath.find {
+        it.name.contains('mockito-core')
+    }
+    if (mockitoAgent) {
+        jvmArgs = ["-javaagent:${mockitoAgent.absolutePath}", '--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED']
+    } else {
+        jvmArgs = ['--add-opens=java.base/java.lang=ALL-UNNAMED', '--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED']
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

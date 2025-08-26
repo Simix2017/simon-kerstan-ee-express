@@ -1,0 +1,38 @@
+plugins {
+    id 'java-library'
+    id("io.freefair.lombok") version "8.14"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api 'jakarta.validation:jakarta.validation-api:3.1.1'
+
+    implementation project(':ee-express-core')
+    implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
+
+    testImplementation platform('org.junit:junit-bom:5.10.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.19.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(Test).configureEach {
+    def mockitoAgent = configurations.testRuntimeClasspath.find {
+        it.name.contains('mockito-core')
+    }
+    if (mockitoAgent) {
+        jvmArgs "-javaagent:${mockitoAgent.absolutePath}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

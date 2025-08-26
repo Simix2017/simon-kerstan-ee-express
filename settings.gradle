@@ -1,0 +1,3 @@
+rootProject.name = 'simon-kerstan-ee-express'
+
+include('ee-express', 'ee-express-core', 'ee-express-validation', 'ee-express-web')
