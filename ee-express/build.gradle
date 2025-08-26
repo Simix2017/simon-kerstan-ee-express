@@ -19,3 +19,10 @@ tasks.withType(JavaCompile).configureEach {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+        }
+    }
+}

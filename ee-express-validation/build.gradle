@@ -37,3 +37,10 @@ tasks.withType(Test).configureEach {
 test {
     useJUnitPlatform()
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+        }
+    }
+}
