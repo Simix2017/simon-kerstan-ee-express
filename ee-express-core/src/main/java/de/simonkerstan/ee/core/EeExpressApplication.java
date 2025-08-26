@@ -7,6 +7,7 @@ package de.simonkerstan.ee.core;
 
 import de.simonkerstan.ee.core.bootstrap.MainApplicationHook;
 import de.simonkerstan.ee.core.clazz.ClassScanner;
+import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
 import de.simonkerstan.ee.core.di.DependencyInjectionHook;
 
 /**
@@ -52,8 +53,10 @@ public final class EeExpressApplication {
 
         // Load the configuration and map it to the application context
         // TODO: Load configuration from different sources (e.g. environment variables)
+        final var configuration = new DefaultConfiguration();
+        dependencyInjectionHook.addConfiguration(configuration);
 
-        return new ApplicationContext(null, classScanner.getScanPackages(), dependencyInjectionHook.getBeans(),
+        return new ApplicationContext(configuration, classScanner.getScanPackages(), dependencyInjectionHook.getBeans(),
                                       mainApplication);
     }
 

@@ -8,6 +8,7 @@ package de.simonkerstan.ee.core.di;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
+import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.di.graph.ConstructorBeanCreationInformation;
 import de.simonkerstan.ee.core.di.graph.DependencyGraph;
 import jakarta.inject.Inject;
@@ -108,6 +109,18 @@ public class DependencyInjectionHook implements ClassHook, ConstructorHook, Meth
      */
     public Map<Class<?>, Object> getBeans() {
         return Collections.unmodifiableMap(this.beans);
+    }
+
+    /**
+     * Add a configuration to the dependency injection hook.
+     *
+     * @param configuration Configuration to be added
+     * @deprecated Because a better mechanism must be implemented in the future.
+     */
+    @Deprecated
+    public void addConfiguration(Configuration configuration) {
+        // TODO: Replace with better mechanism
+        this.beans.put(Configuration.class, configuration);
     }
 
     /**
