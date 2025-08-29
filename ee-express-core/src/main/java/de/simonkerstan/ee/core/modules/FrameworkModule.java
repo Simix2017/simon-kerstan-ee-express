@@ -50,6 +50,6 @@ public interface FrameworkModule {
      *
      * @return Bean providers
      */
-    List<BeanProvider> beanProviders();
+    List<BeanProvider<?>> beanProviders();
 
 }

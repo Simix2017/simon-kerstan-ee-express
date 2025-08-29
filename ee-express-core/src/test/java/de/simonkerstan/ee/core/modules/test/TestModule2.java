@@ -37,8 +37,8 @@ public class TestModule2 implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider> beanProviders() {
-        return List.of(new BeanProvider(CoolFrameworkBean.class, this.coolFrameworkBean, 0));
+    public List<BeanProvider<?>> beanProviders() {
+        return List.of(new BeanProvider<>(CoolFrameworkBean.class, this.coolFrameworkBean, 0));
     }
 
 }
