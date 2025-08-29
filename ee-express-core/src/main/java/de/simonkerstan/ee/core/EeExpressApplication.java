@@ -7,8 +7,14 @@ package de.simonkerstan.ee.core;
 
 import de.simonkerstan.ee.core.bootstrap.MainApplicationHook;
 import de.simonkerstan.ee.core.clazz.ClassScanner;
+import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
+import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.di.DependencyInjectionHook;
+import de.simonkerstan.ee.core.modules.FrameworkModule;
+import de.simonkerstan.ee.core.modules.FrameworkModuleLoader;
+
+import java.util.List;
 
 /**
  * Main application initializer.
@@ -26,12 +32,19 @@ public final class EeExpressApplication {
      * @return Application context
      */
     public static ApplicationContext initialize(String[] args, String... bootstrapPackages) {
-        // Scan for classes and methods with annotations
-        // This will create beans and contexts (for Jakarta CDI) and register them in the application context
-        // Also, the main application class will be registered in the application context
+        // Scan for classes and methods with annotations.
+        // This will create beans and contexts (for Jakarta CDI) and register them in the application context.
+        // Also, the main application class will be registered in the application context.
+        // In addition to that, also all framework modules will be loaded, initialized and registered.
+
+        // Load all framework modules
+        final var modules = FrameworkModuleLoader.loadFrameworkModules();
+
+        // Prepare all framework hooks
         final var dependencyInjectionHook = new DependencyInjectionHook();
         final var mainApplicationHook = new MainApplicationHook();
 
+        // Scan all base packages for dependency injection and module initialization
         final var classScanner = new ClassScanner(bootstrapPackages);
         // Register dependency injection hooks
         classScanner.registerClassHook(dependencyInjectionHook);
@@ -39,10 +52,27 @@ public final class EeExpressApplication {
         classScanner.registerMethodHook(dependencyInjectionHook);
         // Register the main application hook
         classScanner.registerClassHook(mainApplicationHook);
+        // Register all module hooks
+        modules.forEach(module -> module.classHooks()
+                .forEach(classScanner::registerClassHook));
+        modules.forEach(module -> module.constructorHooks()
+                .forEach(classScanner::registerConstructorHook));
+        modules.forEach(module -> module.methodHooks()
+                .forEach(classScanner::registerMethodHook));
         // Scan for classes and methods
         classScanner.scan();
 
+        // Initialize all framework modules
+        modules.forEach(FrameworkModule::init);
+
+        // Create all beans and set up the CDI context
+        modules.stream()
+                .map(FrameworkModule::beanProviders)
+                .flatMap(List::stream)
+                .forEach(dependencyInjectionHook::addBeanProvider);
         dependencyInjectionHook.postProcess();
+
+        // Get the main application class and save it in the application context
         final var mainClass = mainApplicationHook.getMainApplicationClass();
         final Runnable mainApplication;
         if (mainClass != null) {
@@ -54,7 +84,7 @@ public final class EeExpressApplication {
         // Load the configuration and map it to the application context
         // TODO: Load configuration from different sources (e.g. environment variables)
         final var configuration = new DefaultConfiguration();
-        dependencyInjectionHook.addConfiguration(configuration);
+        dependencyInjectionHook.addBeanProvider(new BeanProvider<>(Configuration.class, configuration, 0));
 
         return new ApplicationContext(configuration, classScanner.getScanPackages(), dependencyInjectionHook.getBeans(),
                                       mainApplication);

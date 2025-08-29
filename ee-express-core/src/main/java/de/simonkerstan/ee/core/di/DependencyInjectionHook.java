@@ -8,9 +8,9 @@ package de.simonkerstan.ee.core.di;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
-import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.di.graph.ConstructorBeanCreationInformation;
 import de.simonkerstan.ee.core.di.graph.DependencyGraph;
+import de.simonkerstan.ee.core.di.graph.ObjectBeanCreationInformation;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -32,22 +32,26 @@ public class DependencyInjectionHook implements ClassHook, ConstructorHook, Meth
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
     private final Map<Class<?>, BeanInformation> unresolvedBeans = new HashMap<>();
+    private final DependencyGraph dependencyGraph = new DependencyGraph();
 
     /*
     This hook gets all annotated methods and classes used by Jakarta CDI and creates all beans and contexts after
     scanning in the "postProcess" method.
      */
 
+    @SuppressWarnings("unchecked")
     @Override
     public Class<? extends Annotation>[] getClassAnnotations() {
         return new Class[]{Singleton.class};
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Class<? extends Annotation>[] getConstructorAnnotations() {
         return new Class[]{Inject.class, Singleton.class};
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Class<? extends Annotation>[] getMethodAnnotations() {
         return new Class[0];
@@ -91,6 +95,17 @@ public class DependencyInjectionHook implements ClassHook, ConstructorHook, Meth
     }
 
     /**
+     * Add a bean provider from a framework module.
+     *
+     * @param beanProvider Bean provider to be added
+     */
+    public void addBeanProvider(BeanProvider<?> beanProvider) {
+        final var beanCreationInformation = new ObjectBeanCreationInformation(beanProvider.instance());
+        this.dependencyGraph.addBean(beanProvider.priority(), beanProvider.type(), beanCreationInformation,
+                                     new Class[]{});
+    }
+
+    /**
      * Get an instantiated bean of the given class.
      *
      * @param clazz Class of the bean
@@ -112,29 +127,16 @@ public class DependencyInjectionHook implements ClassHook, ConstructorHook, Meth
     }
 
     /**
-     * Add a configuration to the dependency injection hook.
-     *
-     * @param configuration Configuration to be added
-     * @deprecated Because a better mechanism must be implemented in the future.
-     */
-    @Deprecated
-    public void addConfiguration(Configuration configuration) {
-        // TODO: Replace with better mechanism
-        this.beans.put(Configuration.class, configuration);
-    }
-
-    /**
      * Process all scanned classes and methods to create beans and contexts.
      */
     public void postProcess() {
-        final var dependencyGraph = new DependencyGraph();
         this.unresolvedBeans.forEach((clazz, beanInformation) -> {
-            dependencyGraph.addBean(beanInformation.getPriority(), clazz, beanInformation.getCreationInformation(),
-                                    beanInformation.getDependencies()
-                                            .toArray(Class[]::new));
+            this.dependencyGraph.addBean(beanInformation.getPriority(), clazz, beanInformation.getCreationInformation(),
+                                         beanInformation.getDependencies()
+                                                 .toArray(Class[]::new));
         });
 
-        final var beans = dependencyGraph.instantiateBeans();
+        final var beans = this.dependencyGraph.instantiateBeans();
         this.beans.putAll(beans);
     }
 

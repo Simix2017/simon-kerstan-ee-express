@@ -5,6 +5,8 @@
 
 package de.simonkerstan.ee.core.configuration;
 
+import de.simonkerstan.ee.core.exceptions.MissingConfigurationPropertyException;
+
 import java.util.Optional;
 
 /**
@@ -29,9 +31,10 @@ public class DefaultConfiguration implements Configuration {
     }
 
     @Override
-    public <T> T getRequiredPropertyValue(String propertyName, Class<T> type) throws MissingPropertyException {
+    public <T> T getRequiredPropertyValue(String propertyName, Class<T> type) throws
+            MissingConfigurationPropertyException {
         return this.getPropertyValue(propertyName, type)
-                .orElseThrow(() -> new MissingPropertyException(propertyName));
+                .orElseThrow(() -> new MissingConfigurationPropertyException(propertyName));
     }
 
 }

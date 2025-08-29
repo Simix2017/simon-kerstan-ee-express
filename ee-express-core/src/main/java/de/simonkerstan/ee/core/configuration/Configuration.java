@@ -5,6 +5,8 @@
 
 package de.simonkerstan.ee.core.configuration;
 
+import de.simonkerstan.ee.core.exceptions.MissingConfigurationPropertyException;
+
 import java.util.Optional;
 
 /**
@@ -39,8 +41,8 @@ public interface Configuration {
      * @param type         Type of the property value
      * @param <T>          Type of the property value
      * @return Value of the property
-     * @throws MissingPropertyException If the property is missing
+     * @throws MissingConfigurationPropertyException If the property is missing
      */
-    <T> T getRequiredPropertyValue(String propertyName, Class<T> type) throws MissingPropertyException;
+    <T> T getRequiredPropertyValue(String propertyName, Class<T> type) throws MissingConfigurationPropertyException;
 
 }

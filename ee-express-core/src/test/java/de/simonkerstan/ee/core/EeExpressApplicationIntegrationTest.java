@@ -20,7 +20,9 @@ class EeExpressApplicationIntegrationTest {
         final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
                                                                              "de.simonkerstan.ee.core.test");
         EeExpressApplication.run(applicationConfiguration);
+        // If the following properties are set, the application (and CDI context with all beans) was set up successfully
         assertEquals("Hello World!", TestStaticHolder.getTestProperty());
+        assertEquals("CoolFrameworkBean", TestStaticHolder.getTestBeanProviderProperty());
     }
 
     @Test

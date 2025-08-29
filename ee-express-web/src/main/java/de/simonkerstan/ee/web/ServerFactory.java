@@ -6,7 +6,7 @@
 package de.simonkerstan.ee.web;
 
 import de.simonkerstan.ee.core.ApplicationContext;
-import de.simonkerstan.ee.core.configuration.MissingPropertyException;
+import de.simonkerstan.ee.core.exceptions.MissingConfigurationPropertyException;
 import de.simonkerstan.ee.web.tomcat.TomcatServer;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ final class ServerFactory {
     public Server createServer(ApplicationContext applicationContext) {
         try {
             return new TomcatServer(applicationContext);
-        } catch (IOException | MissingPropertyException e) {
+        } catch (IOException | MissingConfigurationPropertyException e) {
             throw new RuntimeException("Cannot initialize Tomcat server", e);
         }
     }

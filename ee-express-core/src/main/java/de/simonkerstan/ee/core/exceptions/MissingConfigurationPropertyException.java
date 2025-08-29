@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package de.simonkerstan.ee.core.configuration;
+package de.simonkerstan.ee.core.exceptions;
 
 import lombok.experimental.StandardException;
 
@@ -11,5 +11,5 @@ import lombok.experimental.StandardException;
  * Exception thrown when a required configuration property is missing.
  */
 @StandardException
-public class MissingPropertyException extends Exception {
+public class MissingConfigurationPropertyException extends Exception {
 }
