@@ -34,6 +34,21 @@ tasks.withType(Test).configureEach {
     }
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+javadoc {
+    source = sourceSets.main.allJava
+    options {
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        author = true
+        version = true
+    }
+}
+
 test {
     useJUnitPlatform()
 }
