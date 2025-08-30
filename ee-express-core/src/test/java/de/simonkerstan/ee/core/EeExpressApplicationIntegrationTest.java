@@ -23,6 +23,7 @@ class EeExpressApplicationIntegrationTest {
         // If the following properties are set, the application (and CDI context with all beans) was set up successfully
         assertEquals("Hello World!", TestStaticHolder.getTestProperty());
         assertEquals("CoolFrameworkBean", TestStaticHolder.getTestBeanProviderProperty());
+        assertEquals(8080, TestStaticHolder.getTestConfigurationProperty());
     }
 
     @Test

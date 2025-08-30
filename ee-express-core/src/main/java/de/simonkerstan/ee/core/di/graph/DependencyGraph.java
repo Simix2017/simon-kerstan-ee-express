@@ -6,12 +6,14 @@
 package de.simonkerstan.ee.core.di.graph;
 
 import de.simonkerstan.ee.core.exceptions.BeanInstantiationException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
 /**
  * Graph with all beans and their dependencies.
  */
+@Slf4j
 public final class DependencyGraph {
 
     /**
@@ -59,6 +61,7 @@ public final class DependencyGraph {
     public Map<Class<?>, Object> instantiateBeans() throws BeanInstantiationException {
         if (this.hasUnresolvedDependencies()) {
             // Not all dependencies are resolvable
+            log.error("Missing instantiated beans: {}", this.unresolvedDependencies.keySet());
             throw new BeanInstantiationException("Cannot instantiate beans due to unresolvable dependencies");
         }
 

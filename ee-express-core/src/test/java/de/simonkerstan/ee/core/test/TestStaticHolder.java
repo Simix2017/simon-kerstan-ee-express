@@ -21,4 +21,8 @@ public class TestStaticHolder {
     @Setter
     private static String testBeanProviderProperty = "";
 
+    @Getter
+    @Setter
+    private static int testConfigurationProperty;
+
 }

@@ -13,12 +13,14 @@ import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.di.DependencyInjectionHook;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 import de.simonkerstan.ee.core.modules.FrameworkModuleLoader;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 /**
  * Main application initializer.
  */
+@Slf4j
 public final class EeExpressApplication {
 
     private EeExpressApplication() {
@@ -39,10 +41,19 @@ public final class EeExpressApplication {
 
         // Load all framework modules
         final var modules = FrameworkModuleLoader.loadFrameworkModules();
+        if (log.isInfoEnabled()) {
+            modules.forEach(module -> log.info("Loaded framework module {}", module.getClass()
+                    .getName()));
+        }
 
         // Prepare all framework hooks
         final var dependencyInjectionHook = new DependencyInjectionHook();
         final var mainApplicationHook = new MainApplicationHook();
+
+        // Load the configuration and map it to the application context
+        // TODO: Load configuration from different sources (e.g. environment variables)
+        final var configuration = new DefaultConfiguration();
+        dependencyInjectionHook.addBeanProvider(new BeanProvider<>(Configuration.class, configuration, 0));
 
         // Scan all base packages for dependency injection and module initialization
         final var classScanner = new ClassScanner(bootstrapPackages);
@@ -80,11 +91,6 @@ public final class EeExpressApplication {
         } else {
             mainApplication = null;
         }
-
-        // Load the configuration and map it to the application context
-        // TODO: Load configuration from different sources (e.g. environment variables)
-        final var configuration = new DefaultConfiguration();
-        dependencyInjectionHook.addBeanProvider(new BeanProvider<>(Configuration.class, configuration, 0));
 
         return new ApplicationContext(configuration, classScanner.getScanPackages(), dependencyInjectionHook.getBeans(),
                                       mainApplication);
