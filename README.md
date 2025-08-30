@@ -33,6 +33,9 @@ This project bundles all modules of this framework into one dependency.
 Core Jakarta EE runtime with Jakarta EE CDI and configuration APIs. This can be used for non-web applications and has
 APIs for bootstrapping the application. Every other module inside the framework is based on this module.
 
+Besides core APIs from Jakarta EE, this module also provides logging via SLF4J (which uses Logback Classic behind the
+scenes).
+
 The CDI implementation does only support dependency injection via annotations currently and does not support the full
 CDI specification.
 

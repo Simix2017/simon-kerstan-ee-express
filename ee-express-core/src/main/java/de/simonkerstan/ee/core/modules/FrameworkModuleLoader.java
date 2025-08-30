@@ -22,6 +22,8 @@ import java.util.Objects;
 @Slf4j
 public final class FrameworkModuleLoader {
 
+    private static final String FRAMEWORK_MODULES_DIRECTORY = "META-INF/de-simonkerstan-ee-express/modules";
+
     private FrameworkModuleLoader() {
     }
 
@@ -33,7 +35,7 @@ public final class FrameworkModuleLoader {
     public static List<FrameworkModule> loadFrameworkModules() {
         try (final var is = Thread.currentThread()
                 .getContextClassLoader()
-                .getResourceAsStream("de-simonkerstan-ee-express")) {
+                .getResourceAsStream(FRAMEWORK_MODULES_DIRECTORY)) {
             if (is == null) {
                 throw new IOException("Cannot find framework modules");
             }
@@ -42,6 +44,7 @@ public final class FrameworkModuleLoader {
             return reader.lines()
                     .parallel()
                     .map(String::trim)
+                    .peek(resource -> log.debug("Found possible framework module resource {}", resource))
                     .filter(FrameworkModuleLoader::isFrameworkModuleResourceEntry)
                     .map(FrameworkModuleLoader::getModuleClassName)
                     .filter(Objects::nonNull)
@@ -61,13 +64,15 @@ public final class FrameworkModuleLoader {
     private static String getModuleClassName(String resourceEntryName) {
         try (final var is = Thread.currentThread()
                 .getContextClassLoader()
-                .getResourceAsStream("de-simonkerstan-ee-express/" + resourceEntryName)) {
+                .getResourceAsStream(FRAMEWORK_MODULES_DIRECTORY + "/" + resourceEntryName)) {
             if (is != null) {
                 // Must be the case because the resource exists
                 final var reader = new BufferedReader(new InputStreamReader(is));
                 return reader.readLine()
                         .trim();
             }
+
+            log.warn("Cannot read resource {}. This should be impossible...", resourceEntryName);
         } catch (IOException e) {
             // Impossible
         }

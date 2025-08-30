@@ -41,8 +41,9 @@ public final class EeExpressApplication {
 
         // Load all framework modules
         final var modules = FrameworkModuleLoader.loadFrameworkModules();
-        if (log.isInfoEnabled()) {
-            modules.forEach(module -> log.info("Loaded framework module {}", module.getClass()
+        log.info("Loaded {} framework modules", modules.size());
+        if (log.isDebugEnabled()) {
+            modules.forEach(module -> log.debug("Loaded framework module {}", module.getClass()
                     .getName()));
         }
 

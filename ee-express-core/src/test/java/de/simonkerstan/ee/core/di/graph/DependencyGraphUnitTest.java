@@ -5,12 +5,7 @@
 
 package de.simonkerstan.ee.core.di.graph;
 
-import de.simonkerstan.ee.core.di.graph.test.SingletonA;
-import de.simonkerstan.ee.core.di.graph.test.SingletonB;
-import de.simonkerstan.ee.core.di.graph.test.TestSingletons1;
-import de.simonkerstan.ee.core.di.graph.test.TestSingletons2;
-import de.simonkerstan.ee.core.test.MainClass;
-import de.simonkerstan.ee.core.test.TestService;
+import de.simonkerstan.ee.core.di.graph.test.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

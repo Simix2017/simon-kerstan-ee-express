@@ -17,8 +17,8 @@ dependencies {
 
     runtimeOnly 'org.apache.johnzon:johnzon-jsonb:2.0.2'
     runtimeOnly 'org.apache.johnzon:johnzon:2.0.2'
-    runtimeOnly 'com.sun.xml.bind:jaxb-impl:4.0.5'
-    runtimeOnly 'org.slf4j:slf4j-jdk14:2.0.17'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
+    runtimeOnly 'ch.qos.logback:logback-classic:1.5.18'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.13.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
