@@ -17,6 +17,11 @@ public class ObjectBeanCreationInformation implements BeanCreationInformation {
     private final Object bean;
 
     @Override
+    public Class<?>[] getDependencies() {
+        return new Class[0];
+    }
+
+    @Override
     public Object createBean(Object... parameters) throws BeanInstantiationException {
         return this.bean;
     }

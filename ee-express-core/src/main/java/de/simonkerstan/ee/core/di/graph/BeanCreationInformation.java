@@ -13,6 +13,13 @@ import de.simonkerstan.ee.core.exceptions.BeanInstantiationException;
 public interface BeanCreationInformation {
 
     /**
+     * Get the dependencies of the bean.
+     *
+     * @return Dependencies of the bean
+     */
+    Class<?>[] getDependencies();
+
+    /**
      * Create a bean instance with the given parameters. This method is allowed to only create a bean instance
      * one-time and reuse it for all following calls.
      *

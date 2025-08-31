@@ -39,8 +39,7 @@ public final class DependencyGraph {
         // TODO: Check if bean already exists
         Arrays.stream(ProvidedTypesResolver.resolve(type))
                 // Add all resolved types to the graph
-                .forEach(resolvedType -> this.insertOneBeanType(priority, resolvedType, beanCreationInformation,
-                                                                dependencies));
+                .forEach(resolvedType -> this.insertOneBeanType(priority, resolvedType, beanCreationInformation));
     }
 
     /**
@@ -104,9 +103,8 @@ public final class DependencyGraph {
 
                 if (hasAllDependenciesInstantiated) {
                     // Instantiate bean
-                    final var constructionParams = node.getDependencies()
-                            .stream()
-                            .map(DependencyGraphNode::getType)
+                    final var constructionParams = Arrays.stream(node.getBeanCreationInformation()
+                                                                         .getDependencies())
                             // Get instantiated dependency beans
                             .map(beans::get)
                             .toArray();
@@ -130,8 +128,7 @@ public final class DependencyGraph {
         return beans;
     }
 
-    private void insertOneBeanType(int priority, Class<?> type, BeanCreationInformation beanCreationInformation,
-                                   Class<?>[] dependencies) {
+    private void insertOneBeanType(int priority, Class<?> type, BeanCreationInformation beanCreationInformation) {
         final var beanClassName = type.getName();
 
         // Create a new node for the bean
@@ -145,7 +142,7 @@ public final class DependencyGraph {
         }
         this.unresolvedDependencies.remove(beanClassName);
 
-        final var dependencyNames = Arrays.stream(dependencies)
+        final var dependencyNames = Arrays.stream(beanCreationInformation.getDependencies())
                 .map(Class::getName)
                 .toList();
         // Add all dependencies to the new node
