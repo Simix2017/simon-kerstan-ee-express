@@ -13,6 +13,8 @@ import java.io.IOException;
 
 /**
  * Factory for creating a web server.
+ * <p>
+ * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 final class ServerFactory {
 
@@ -34,7 +36,7 @@ final class ServerFactory {
     public Server createServer(ApplicationContext applicationContext) {
         try {
             return new TomcatServer(applicationContext);
-        } catch (IOException | MissingConfigurationPropertyException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Cannot initialize Tomcat server", e);
         }
     }

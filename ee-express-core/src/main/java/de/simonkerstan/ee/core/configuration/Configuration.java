@@ -28,11 +28,12 @@ public interface Configuration {
      * Get the value of a configuration property.
      *
      * @param propertyName Name of the property
+     * @param type         Type of the property value
      * @param defaultValue Default value if the property is missing
      * @param <T>          Type of the property value
      * @return Value of the property or the default value if the property is missing
      */
-    <T> T getPropertyValue(String propertyName, T defaultValue);
+    <T> T getPropertyValue(String propertyName, Class<T> type, T defaultValue);
 
     /**
      * Get a required value of a configuration property.

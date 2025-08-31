@@ -6,7 +6,6 @@
 package de.simonkerstan.ee.web.tomcat;
 
 import de.simonkerstan.ee.core.ApplicationContext;
-import de.simonkerstan.ee.core.exceptions.MissingConfigurationPropertyException;
 import de.simonkerstan.ee.web.Server;
 import de.simonkerstan.ee.web.hk2.EeExpressHk2DependencyBinder;
 import jakarta.servlet.Servlet;
@@ -25,9 +24,13 @@ import java.nio.file.Files;
 
 /**
  * Tomcat server implementation.
+ * <p>
+ * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 @Slf4j
 public class TomcatServer implements Server {
+
+    private static final int DEFAULT_SERVER_PORT = 8080;
 
     private final Tomcat tomcat;
     private final Context context;
@@ -39,13 +42,11 @@ public class TomcatServer implements Server {
      * Create a new Tomcat server instance.
      *
      * @param applicationContext Application context to be used by the server implementation
-     * @throws IOException              If the temporary directory cannot be created
-     * @throws MissingConfigurationPropertyException If the required server port is missing
+     * @throws IOException If the temporary directory cannot be created
      */
-    public TomcatServer(ApplicationContext applicationContext) throws IOException,
-            MissingConfigurationPropertyException {
+    public TomcatServer(ApplicationContext applicationContext) throws IOException {
         this(applicationContext.getConfiguration()
-                     .getRequiredPropertyValue("server.port", Integer.class), applicationContext);
+                     .getPropertyValue("server.port", Integer.class, DEFAULT_SERVER_PORT), applicationContext);
     }
 
     TomcatServer(int port, ApplicationContext applicationContext) throws IOException {

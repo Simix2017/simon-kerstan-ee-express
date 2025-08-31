@@ -56,8 +56,7 @@ public final class EeExpressApplication {
         final var mainApplicationHook = new MainApplicationHook();
 
         // Load the configuration and map it to the application context
-        // TODO: Load configuration from different sources (e.g. environment variables)
-        final var configuration = new DefaultConfiguration();
+        final var configuration = new DefaultConfiguration(args);
         dependencyInjectionHook.addBeanProvider(new BeanProvider<>(Configuration.class, configuration, 0));
 
         // Scan all base packages for dependency injection and module initialization
@@ -80,7 +79,8 @@ public final class EeExpressApplication {
         classScanner.scan();
 
         // Initialize all framework modules
-        modules.forEach(FrameworkModule::init);
+        // TODO: sort framework modules by priority (so that configuration is initialized first)
+        modules.forEach(module -> module.init(configuration));
 
         // Create all beans and set up the CDI context
         modules.stream()
@@ -98,6 +98,7 @@ public final class EeExpressApplication {
             mainApplication = null;
         }
 
+        // Create the application context
         return new ApplicationContext(configuration, classScanner.getScanPackages(), dependencyInjectionHook.getBeans(),
                                       mainApplication);
     }

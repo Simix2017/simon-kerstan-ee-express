@@ -13,10 +13,10 @@ class FrameworkModuleLoaderUnitTest {
     @DisplayName("Load all modules -> Should load all modules")
     void testLoadModules() {
         final var modules = FrameworkModuleLoader.loadFrameworkModules(ClasspathResolver.getWrapperForFullClasspath());
-        assertEquals(1, modules.size());
+        assertEquals(2, modules.size());
 
-        // Assert TestModule is loaded
-        final var testModule = modules.get(0);
+        // Assert TestModule is loaded (0 = core module; 1 = test module)
+        final var testModule = modules.get(1);
         assertSame(TestModule.class, testModule.getClass());
     }
 

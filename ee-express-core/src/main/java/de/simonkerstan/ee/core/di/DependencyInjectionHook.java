@@ -26,6 +26,8 @@ import java.util.Map;
 
 /**
  * Hook for dependency injection used by the class scanning mechanism.
+ * <p>
+ * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 @Slf4j
 public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, ConstructorHook, MethodHook {

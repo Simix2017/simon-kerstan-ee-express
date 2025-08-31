@@ -22,16 +22,23 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 If you want to contribute to this project, please read the [contributing guidelines](CONTRIBUTING.md).
 
+## Compatibility
+
+This project is compatible with Java 17 and above. Currently, the framework is based on
+[Jakarta EE Platform 11](https://jakarta.ee/specifications/platform/11/).
+
 ## Projects
 
 ### EE Express
 
-This project bundles all modules of this framework into one dependency.
+This project bundles all modules of this framework into one dependency. It only makes sense for web applications.
 
 ### EE Express Core
 
+[Module documentation](docs/core.md)
+
 Core Jakarta EE runtime with Jakarta EE CDI and configuration APIs. This can be used for non-web applications and has
-APIs for bootstrapping the application. Every other module inside the framework is based on this module.
+APIs for bootstrapping the application. Every other module of the framework is based on this module.
 
 Besides core APIs from Jakarta EE, this module also provides logging via SLF4J (which uses Logback Classic behind the
 scenes).
@@ -39,12 +46,13 @@ scenes).
 The CDI implementation does only support dependency injection via annotations currently and does not support the full
 CDI specification.
 
-The following Jakarta EE APIs are available inside this module:
+The following Jakarta EE (and own) APIs are available inside this module:
 
 - [Jakarta Dependency Injection 2.0](https://jakarta.ee/specifications/dependency-injection/2.0/)
 - [Jakarta JSON Binding 3.0](https://jakarta.ee/specifications/jsonb/3.0/)
 - [Jakarta JSON Processing 2.1](https://jakarta.ee/specifications/jsonp/2.1/)
 - [Jakarta XML Binding 4.0](https://jakarta.ee/specifications/xml-binding/4.0/)
+- [Configuration API](docs/core/configuration.md)
 
 ### EE Express Validation
 
@@ -56,9 +64,11 @@ The following Jakarta EE APIs are available inside this module:
 
 ### EE Express Web
 
+[Module documentation](docs/web.md)
+
 Web Jakarta EE runtime with a Servlet and JAX-RS runtime. Currently, Tomcat is used as the embedded web server and
 Jersey is used as the JAX-RS implementation. If using this module, you do not need to bootstrap the application
-yourself. Instead, you can just start the server. Please note that JAX-RS is automatically enabled for path `/api/**`.
+yourself. Instead, you can start the server. Please note that JAX-RS is automatically enabled for path `/api/**`.
 
 The following Jakarta EE APIs are available inside this module:
 
@@ -138,7 +148,6 @@ annotation. An example of a `MainApplication` class could look like this (instea
 package com.example;
 
 import de.simonkerstan.ee.core.annotations.MainApplication;
-
 import jakarta.inject.Inject;
 
 @MainApplication
@@ -204,3 +213,16 @@ public class Main {
 
 }
 ```
+
+### Configuration
+
+Configuration handling is implemented in the EE Express Core module. You can use the `Configuration` class to
+retrieve configuration values. Different sources are used to retrieve the configuration values:
+
+- System properties
+- Environment variables
+- Configuration files
+- Configuration properties
+
+All framework modules have their own configuration options. You can find the configuration options for each module
+inside the documentation of the module.

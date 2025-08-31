@@ -8,6 +8,7 @@ package de.simonkerstan.ee.core.modules;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
+import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.di.BeanProvider;
 
 import java.util.List;
@@ -21,8 +22,10 @@ public interface FrameworkModule {
 
     /**
      * Initialize the module. This method will be called after class scanning, so the results of the hooks can be used.
+     *
+     * @param configuration Configuration of the framework
      */
-    void init();
+    void init(Configuration configuration);
 
     /**
      * Get all class hooks of this module.
