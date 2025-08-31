@@ -25,6 +25,7 @@ public class ClassScanner {
     private final String[] scanPackages;
     private final ClasspathItem classpathItem;
     private final Map<Class<? extends Annotation>, List<ClassHook>> classHooks = new HashMap<>();
+    private final List<ClassInterfacesHook> classInterfacesHooks = new LinkedList<>();
     private final Map<Class<? extends Annotation>, List<ConstructorHook>> constructorHooks = new HashMap<>();
     private final Map<Class<? extends Annotation>, List<MethodHook>> methodHooks = new HashMap<>();
 
@@ -47,6 +48,15 @@ public class ClassScanner {
         Arrays.stream(hook.getClassAnnotations())
                 .forEach(annotation -> classHooks.computeIfAbsent(annotation, key -> new ArrayList<>())
                         .add(hook));
+    }
+
+    /**
+     * Register a class interfaces hook to be called for all classes.
+     *
+     * @param hook Class interfaces hook to be called
+     */
+    public void registerClassInterfacesHook(ClassInterfacesHook hook) {
+        this.classInterfacesHooks.add(hook);
     }
 
     /**
@@ -76,6 +86,7 @@ public class ClassScanner {
      */
     public void scan() {
         final var hasClassHooks = !this.classHooks.isEmpty();
+        final var hasClassInterfacesHooks = !this.classInterfacesHooks.isEmpty();
         final var hasConstructorHooks = !this.constructorHooks.isEmpty();
         final var hasMethodHooks = !this.methodHooks.isEmpty();
         Arrays.stream(this.scanPackages)
@@ -93,6 +104,15 @@ public class ClassScanner {
                                     .orElse(List.of())
                                     .forEach(hook -> hook.processClass(clazz, key, value));
                         });
+                    }
+
+                    if (hasClassInterfacesHooks) {
+                        // Call class interfaces hooks
+                        log.debug("Processing interfaces of class {}", clazz.getName());
+                        if (!clazz.isInterface() && !clazz.isArray() && !clazz.isEnum() && !clazz.isPrimitive()) {
+                            this.classInterfacesHooks.forEach(
+                                    hook -> hook.processClassInterfaces(clazz, clazz.getInterfaces()));
+                        }
                     }
 
                     if (hasConstructorHooks) {

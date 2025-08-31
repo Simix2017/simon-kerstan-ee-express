@@ -10,6 +10,8 @@ import java.lang.reflect.Constructor;
 
 /**
  * Constructor annotations hook for class scanning.
+ * <p>
+ * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 public interface ConstructorHook {
 

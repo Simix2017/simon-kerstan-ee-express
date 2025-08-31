@@ -29,6 +29,8 @@ class DependencyGraphUnitTest {
         tested.addBean(0, TestService.class,
                        new ConstructorBeanCreationInformation(TestService.class.getConstructor(), true),
                        new Class<?>[]{});
+
+        // Add a class with a default constructor
         assertFalse(tested.hasUnresolvedDependencies());
     }
 
@@ -38,22 +40,29 @@ class DependencyGraphUnitTest {
         final var tested = new DependencyGraph();
 
         // Add beans
-        tested.addBean(0, MainClass.class,
-                       new ConstructorBeanCreationInformation(MainClass.class.getConstructor(TestService.class), true),
+        tested.addBean(0, MainClass2.class, new ConstructorBeanCreationInformation(
+                               MainClass2.class.getConstructor(TestService.class, BeanWithDefaultConstructor.class),
+                               true),
                        new Class<?>[]{TestService.class});
         tested.addBean(0, TestService.class,
                        new ConstructorBeanCreationInformation(TestService.class.getConstructor(), true),
                        new Class<?>[]{});
 
+        // Add a class with a default constructor
+        tested.addDefaultConstructorClass(BeanWithDefaultConstructor.class,
+                                          new Class<?>[]{BeanWithDefaultConstructor.class});
+
         // Instantiate the beans
         final var result = tested.instantiateBeans();
-        assertEquals(3, result.size());
-        assertTrue(result.containsKey(MainClass.class));
+        assertEquals(4, result.size());
+        assertTrue(result.containsKey(MainClass2.class));
         assertTrue(result.containsKey(Runnable.class));
         assertTrue(result.containsKey(TestService.class));
-        assertNotNull(result.get(MainClass.class));
+        assertTrue(result.containsKey(BeanWithDefaultConstructor.class));
+        assertNotNull(result.get(MainClass2.class));
         assertNotNull(result.get(Runnable.class));
         assertNotNull(result.get(TestService.class));
+        assertNotNull(result.get(BeanWithDefaultConstructor.class));
     }
 
     @Test

@@ -21,6 +21,10 @@ public final class DependencyGraph {
      */
     private final Map<String, DependencyGraphNode> nodes = new HashMap<>();
     /**
+     * Map of all classes with a default constructor (type -> implementing class).
+     */
+    private final Map<Class<?>, Class<?>> defaultConstructorClasses = new HashMap<>();
+    /**
      * Map of all unresolved dependencies. (class name -> list of unsatisfied consumers)
      */
     private final Map<String, List<DependencyGraphNode>> unresolvedDependencies = new HashMap<>();
@@ -39,7 +43,19 @@ public final class DependencyGraph {
         // TODO: Check if bean already exists
         Arrays.stream(ProvidedTypesResolver.resolve(type))
                 // Add all resolved types to the graph
-                .forEach(resolvedType -> this.insertOneBeanType(priority, resolvedType, beanCreationInformation));
+                .forEach(resolvedType -> this.insertOneBeanType(priority, resolvedType, beanCreationInformation, true));
+    }
+
+    /**
+     * Add a class with a default constructor to the list of classes with a default constructor.
+     *
+     * @param clazz      Class with a default constructor
+     * @param interfaces Directly implemented interfaces of the given class
+     */
+    public void addDefaultConstructorClass(Class<?> clazz, Class<?>[] interfaces) {
+        this.defaultConstructorClasses.put(clazz, clazz);
+        Arrays.stream(interfaces)
+                .forEach(directInterface -> this.defaultConstructorClasses.put(directInterface, clazz));
     }
 
     /**
@@ -59,9 +75,16 @@ public final class DependencyGraph {
      */
     public Map<Class<?>, Object> instantiateBeans() throws BeanInstantiationException {
         if (this.hasUnresolvedDependencies()) {
-            // Not all dependencies are resolvable
-            log.error("Missing instantiated beans: {}", this.unresolvedDependencies.keySet());
-            throw new BeanInstantiationException("Cannot instantiate beans due to unresolvable dependencies");
+            // Not all dependencies are resolvable after scanning all classes for @Inject.
+            // There could be beans with a default constructor which could be without any annotation. We must now try
+            // to instantiate them.
+            this.instantiateBeansUsingDefaultConstructor();
+
+            if (this.hasUnresolvedDependencies()) {
+                // There are still unresolved dependencies, so we can only throw an exception
+                log.error("Missing instantiated beans: {}", this.unresolvedDependencies.keySet());
+                throw new BeanInstantiationException("Cannot instantiate beans due to unresolvable dependencies");
+            }
         }
 
         // Create a copy of all nodes to allow removing already instantiated beans
@@ -128,7 +151,8 @@ public final class DependencyGraph {
         return beans;
     }
 
-    private void insertOneBeanType(int priority, Class<?> type, BeanCreationInformation beanCreationInformation) {
+    private void insertOneBeanType(int priority, Class<?> type, BeanCreationInformation beanCreationInformation,
+                                   boolean removeFromUnresolvedDependencies) {
         final var beanClassName = type.getName();
 
         // Create a new node for the bean
@@ -140,7 +164,9 @@ public final class DependencyGraph {
         if (unsatisfiedConsumers != null) {
             unsatisfiedConsumers.forEach(consumer -> consumer.addDependency(node));
         }
-        this.unresolvedDependencies.remove(beanClassName);
+        if (removeFromUnresolvedDependencies) {
+            this.unresolvedDependencies.remove(beanClassName);
+        }
 
         final var dependencyNames = Arrays.stream(beanCreationInformation.getDependencies())
                 .map(Class::getName)
@@ -156,6 +182,36 @@ public final class DependencyGraph {
                 .forEach(dependencyName -> this.unresolvedDependencies.computeIfAbsent(dependencyName,
                                                                                        key -> new ArrayList<>())
                         .add(node));
+    }
+
+    /**
+     * Try to instantiate all unresolved beans using their default constructor. If it does not exist, we have no chance
+     * to instantiate them, and there will be left-overs.
+     */
+    private void instantiateBeansUsingDefaultConstructor() {
+        final var iterator = this.unresolvedDependencies.entrySet()
+                .iterator();
+        Map.Entry<String, List<DependencyGraphNode>> entry;
+        while (iterator.hasNext()) {
+            entry = iterator.next();
+            final var beanTypeName = entry.getKey();
+            this.defaultConstructorClasses.entrySet()
+                    .stream()
+                    .filter(entry1 -> beanTypeName.equals(entry1.getKey()
+                                                                  .getName()))
+                    .findAny()
+                    .ifPresent(entry1 -> {
+                        // Class with a default constructor for this bean exists
+                        try {
+                            this.insertOneBeanType(0, entry1.getKey(), new ConstructorBeanCreationInformation(
+                                    entry1.getValue()
+                                            .getDeclaredConstructor(), false), false);
+                            iterator.remove();
+                        } catch (NoSuchMethodException e) {
+                            // Impossible
+                        }
+                    });
+        }
     }
 
 }

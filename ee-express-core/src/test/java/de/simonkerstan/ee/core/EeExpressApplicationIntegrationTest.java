@@ -7,6 +7,7 @@ package de.simonkerstan.ee.core;
 
 import de.simonkerstan.ee.core.exceptions.BeanInstantiationException;
 import de.simonkerstan.ee.core.test.TestStaticHolder;
+import de.simonkerstan.ee.core.test4.Test4;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,17 @@ class EeExpressApplicationIntegrationTest {
         assertEquals("Hello World!", TestStaticHolder.getTestProperty());
         assertEquals("CoolFrameworkBean", TestStaticHolder.getTestBeanProviderProperty());
         assertEquals(8080, TestStaticHolder.getTestConfigurationProperty());
+    }
+
+    @Test
+    @DisplayName("There is no default constructor in the test4 package -> Should run the application")
+    void testRunWithDefaultConstructor() {
+        final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
+                                                                             "de.simonkerstan.ee.core.test4");
+        EeExpressApplication.run(applicationConfiguration);
+        // If the following properties are set, the application (and CDI context with all beans) was set up successfully
+        assertEquals("Hello World", Test4.getTest());
+        assertEquals("Hello World!", Test4.getTest2());
     }
 
     @Test

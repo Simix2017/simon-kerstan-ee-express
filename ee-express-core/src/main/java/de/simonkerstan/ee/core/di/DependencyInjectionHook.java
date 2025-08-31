@@ -6,6 +6,7 @@
 package de.simonkerstan.ee.core.di;
 
 import de.simonkerstan.ee.core.clazz.ClassHook;
+import de.simonkerstan.ee.core.clazz.ClassInterfacesHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.di.graph.ConstructorBeanCreationInformation;
@@ -27,7 +28,7 @@ import java.util.Map;
  * Hook for dependency injection used by the class scanning mechanism.
  */
 @Slf4j
-public class DependencyInjectionHook implements ClassHook, ConstructorHook, MethodHook {
+public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, ConstructorHook, MethodHook {
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
@@ -66,6 +67,19 @@ public class DependencyInjectionHook implements ClassHook, ConstructorHook, Meth
             beanInformation.setSingleton(true);
             beanInformation.setCreationInformation(ConstructorBeanCreationInformation.of(
                     (ConstructorBeanCreationInformation) beanInformation.getCreationInformation(), true));
+        }
+    }
+
+    @Override
+    public void processClassInterfaces(Class<?> clazz, Class<?>[] interfaces) {
+        final var constructors = Arrays.stream(clazz.getDeclaredConstructors())
+                .filter(constructor -> constructor.canAccess(null))
+                .toList();
+        if (constructors.size() == 1 && constructors.get(0)
+                .getParameterTypes().length == 0) {
+            // Only default constructor
+            log.debug("Processing default constructor of class {}", clazz.getName());
+            this.dependencyGraph.addDefaultConstructorClass(clazz, interfaces);
         }
     }
 

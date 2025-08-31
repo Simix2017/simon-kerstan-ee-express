@@ -64,6 +64,7 @@ public final class EeExpressApplication {
         final var classScanner = new ClassScanner(bootstrapPackages, classpathItem);
         // Register dependency injection hooks
         classScanner.registerClassHook(dependencyInjectionHook);
+        classScanner.registerClassInterfacesHook(dependencyInjectionHook);
         classScanner.registerConstructorHook(dependencyInjectionHook);
         classScanner.registerMethodHook(dependencyInjectionHook);
         // Register the main application hook
