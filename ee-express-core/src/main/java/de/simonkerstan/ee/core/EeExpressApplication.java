@@ -6,6 +6,7 @@
 package de.simonkerstan.ee.core;
 
 import de.simonkerstan.ee.core.bootstrap.MainApplicationHook;
+import de.simonkerstan.ee.core.classpath.ClasspathResolver;
 import de.simonkerstan.ee.core.clazz.ClassScanner;
 import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
@@ -39,9 +40,12 @@ public final class EeExpressApplication {
         // Also, the main application class will be registered in the application context.
         // In addition to that, also all framework modules will be loaded, initialized and registered.
 
+        // Get a wrapper for the full classpath
+        final var classpathItem = ClasspathResolver.getWrapperForFullClasspath();
+
         // Load all framework modules
-        final var modules = FrameworkModuleLoader.loadFrameworkModules();
-        log.info("Loaded {} framework modules", modules.size());
+        final var modules = FrameworkModuleLoader.loadFrameworkModules(classpathItem);
+        log.info("Loaded {} framework module(s)", modules.size());
         if (log.isDebugEnabled()) {
             modules.forEach(module -> log.debug("Loaded framework module {}", module.getClass()
                     .getName()));
@@ -57,7 +61,7 @@ public final class EeExpressApplication {
         dependencyInjectionHook.addBeanProvider(new BeanProvider<>(Configuration.class, configuration, 0));
 
         // Scan all base packages for dependency injection and module initialization
-        final var classScanner = new ClassScanner(bootstrapPackages);
+        final var classScanner = new ClassScanner(bootstrapPackages, classpathItem);
         // Register dependency injection hooks
         classScanner.registerClassHook(dependencyInjectionHook);
         classScanner.registerConstructorHook(dependencyInjectionHook);

@@ -5,6 +5,7 @@
 
 package de.simonkerstan.ee.core.clazz;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,12 +15,15 @@ import java.util.stream.Collectors;
 
 /**
  * Class scanner to find all relevant classes.
+ * <p>
+ * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 @Slf4j
 public class ClassScanner {
 
     @Getter
     private final String[] scanPackages;
+    private final ClasspathItem classpathItem;
     private final Map<Class<? extends Annotation>, List<ClassHook>> classHooks = new HashMap<>();
     private final Map<Class<? extends Annotation>, List<ConstructorHook>> constructorHooks = new HashMap<>();
     private final Map<Class<? extends Annotation>, List<MethodHook>> methodHooks = new HashMap<>();
@@ -29,8 +33,9 @@ public class ClassScanner {
      *
      * @param scanPackages Packages to be scanned for classes
      */
-    public ClassScanner(String[] scanPackages) {
+    public ClassScanner(String[] scanPackages, ClasspathItem classpathItem) {
         this.scanPackages = DistinctPackageTransformer.distinct(scanPackages);
+        this.classpathItem = classpathItem;
     }
 
     /**
@@ -74,7 +79,7 @@ public class ClassScanner {
         final var hasConstructorHooks = !this.constructorHooks.isEmpty();
         final var hasMethodHooks = !this.methodHooks.isEmpty();
         Arrays.stream(this.scanPackages)
-                .map(RecursivePackageClassIterator::new)
+                .map(scanPackage -> new RecursivePackageClassIterator(scanPackage, this.classpathItem))
                 .forEach(iterator -> iterator.forEachRemaining(clazz -> {
                     if (hasClassHooks) {
                         // Call class hooks

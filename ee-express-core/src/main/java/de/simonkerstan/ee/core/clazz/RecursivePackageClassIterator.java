@@ -5,24 +5,27 @@
 
 package de.simonkerstan.ee.core.clazz;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
 /**
  * Recursive package iterator to get all contained classes.
+ * <p>
+ * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 @Slf4j
 final class RecursivePackageClassIterator implements Iterator<Class<?>> {
 
+    private final ClasspathItem classpathItem;
     private final Queue<Class<?>> nextClasses = new LinkedList<>();
 
-    public RecursivePackageClassIterator(String rootPackageName) {
+    public RecursivePackageClassIterator(String rootPackageName, ClasspathItem classpathItem) {
+        this.classpathItem = classpathItem;
+
         // Populate the queue with all recursive subpackages
         this.processPackage(rootPackageName);
     }
@@ -39,21 +42,13 @@ final class RecursivePackageClassIterator implements Iterator<Class<?>> {
 
     private void processPackage(String packageName) {
         final var packagePath = packageName.replace('.', '/');
-        try (final var is = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(packagePath)) {
-            if (is == null) {
-                log.warn("Cannot find package {}", packageName);
-                return;
-            }
-
-            // Iterate over all elements in the package
-            final var reader = new BufferedReader(new InputStreamReader(is));
-            reader.lines()
-                    .forEach(elementName -> processElement(elementName, packageName));
-        } catch (IOException e) {
-            log.warn("Cannot read package {}", packageName, e);
+        if (!this.classpathItem.isResourceExisting(packagePath)) {
+            log.info("Package {} does not exist in classpath", packageName);
+            return;
         }
+
+        this.classpathItem.getChildren(packagePath)
+                .forEach(element -> this.processElement(element, packageName));
     }
 
     private void processElement(String elementName, String packageName) {

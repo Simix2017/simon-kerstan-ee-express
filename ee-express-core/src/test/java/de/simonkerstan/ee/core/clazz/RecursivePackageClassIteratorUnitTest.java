@@ -5,6 +5,7 @@
 
 package de.simonkerstan.ee.core.clazz;
 
+import de.simonkerstan.ee.core.classpath.ClasspathResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +19,8 @@ class RecursivePackageClassIteratorUnitTest {
         final var expected = new Class<?>[]{de.simonkerstan.ee.core.test2.Test.class,
                 de.simonkerstan.ee.core.test2.sub.SubPackageClass.class};
 
-        final var tested = new RecursivePackageClassIterator("de.simonkersten.ee.core.test2");
+        final var tested = new RecursivePackageClassIterator("de.simonkersten.ee.core.test2",
+                                                             ClasspathResolver.getWrapperForFullClasspath());
         int index = 0;
         while (tested.hasNext()) {
             final var clazz = tested.next();

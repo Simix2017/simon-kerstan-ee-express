@@ -5,6 +5,7 @@
 
 package de.simonkerstan.ee.core.modules;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
@@ -32,39 +33,31 @@ public final class FrameworkModuleLoader {
      *
      * @return List of framework modules
      */
-    public static List<FrameworkModule> loadFrameworkModules() {
-        try (final var is = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(FRAMEWORK_MODULES_DIRECTORY)) {
-            if (is == null) {
-                throw new IOException("Cannot find framework modules");
-            }
-
-            final var reader = new BufferedReader(new InputStreamReader(is));
-            return reader.lines()
-                    .parallel()
-                    .map(String::trim)
-                    .peek(resource -> log.debug("Found possible framework module resource {}", resource))
-                    .filter(FrameworkModuleLoader::isFrameworkModuleResourceEntry)
-                    .map(FrameworkModuleLoader::getModuleClassName)
-                    .filter(Objects::nonNull)
-                    .map(FrameworkModuleLoader::instantiateFrameworkModuleClass)
-                    .filter(Objects::nonNull)
-                    .toList();
-        } catch (IOException e) {
-            log.warn("Cannot load framework modules", e);
+    public static List<FrameworkModule> loadFrameworkModules(ClasspathItem classpathItem) {
+        if (!classpathItem.isResourceExisting(FRAMEWORK_MODULES_DIRECTORY)) {
+            log.info("No framework modules found at {}.", FRAMEWORK_MODULES_DIRECTORY);
             return List.of();
         }
+
+        return classpathItem.getChildren(FRAMEWORK_MODULES_DIRECTORY)
+                .stream()
+                .parallel()
+                .map(String::trim)
+                .peek(resource -> log.debug("Found possible framework module resource {}", resource))
+                .filter(FrameworkModuleLoader::isFrameworkModuleResourceEntry)
+                .map(resourceEntryName -> getModuleClassName(resourceEntryName, classpathItem))
+                .filter(Objects::nonNull)
+                .map(FrameworkModuleLoader::instantiateFrameworkModuleClass)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     private static boolean isFrameworkModuleResourceEntry(String resourceEntryName) {
         return resourceEntryName.endsWith(".module");
     }
 
-    private static String getModuleClassName(String resourceEntryName) {
-        try (final var is = Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(FRAMEWORK_MODULES_DIRECTORY + "/" + resourceEntryName)) {
+    private static String getModuleClassName(String resourceEntryName, ClasspathItem classpathItem) {
+        try (final var is = classpathItem.getResourceAsStream(FRAMEWORK_MODULES_DIRECTORY + "/" + resourceEntryName)) {
             if (is != null) {
                 // Must be the case because the resource exists
                 final var reader = new BufferedReader(new InputStreamReader(is));
