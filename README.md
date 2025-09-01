@@ -217,12 +217,9 @@ public class Main {
 ### Configuration
 
 Configuration handling is implemented in the EE Express Core module. You can use the `Configuration` class to
-retrieve configuration values. Different sources are used to retrieve the configuration values:
-
-- System properties
-- Environment variables
-- Configuration files
-- Configuration properties
+retrieve configuration values. Different sources are used to retrieve the configuration values.
 
 All framework modules have their own configuration options. You can find the configuration options for each module
 inside the documentation of the module.
+
+For more information, please see the [configuration API documentation](docs/core/configuration.md).

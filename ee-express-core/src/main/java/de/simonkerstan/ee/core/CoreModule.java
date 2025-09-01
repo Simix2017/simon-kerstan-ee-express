@@ -11,6 +11,7 @@ import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
 import de.simonkerstan.ee.core.configuration.PropertiesFileConfigurationProvider;
+import de.simonkerstan.ee.core.configuration.SystemPropertiesConfigurationProvider;
 import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 
@@ -28,6 +29,12 @@ public class CoreModule implements FrameworkModule {
         if (configuration instanceof DefaultConfiguration defaultConfiguration) {
             // Dirty hack to get the configuration with an automatically registered provider of command-line arguments.
             // If the configuration has the wrong format, nothing will be done in this module
+
+            // Add system properties (second source)
+            final var systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
+            defaultConfiguration.addConfigurationProvider(systemPropertiesConfigurationProvider);
+
+            // Add the properties file (last source)
             final var propertiesFileConfigurationProvider = new PropertiesFileConfigurationProvider();
             defaultConfiguration.addConfigurationProvider(propertiesFileConfigurationProvider);
         }

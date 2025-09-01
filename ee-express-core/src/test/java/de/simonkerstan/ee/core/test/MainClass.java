@@ -35,6 +35,8 @@ public class MainClass implements Runnable {
         try {
             TestStaticHolder.setTestConfigurationProperty(
                     this.configuration.getRequiredPropertyValue("server.port", Integer.class));
+            TestStaticHolder.setTestConfigurationProperty2(
+                    this.configuration.getRequiredPropertyValue("server.alternative_port", Integer.class));
         } catch (MissingConfigurationPropertyException e) {
             fail("Cannot read required configuration property", e);
         }

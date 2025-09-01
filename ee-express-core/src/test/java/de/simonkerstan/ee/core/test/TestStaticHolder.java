@@ -25,4 +25,8 @@ public class TestStaticHolder {
     @Setter
     private static int testConfigurationProperty;
 
+    @Getter
+    @Setter
+    private static int testConfigurationProperty2;
+
 }

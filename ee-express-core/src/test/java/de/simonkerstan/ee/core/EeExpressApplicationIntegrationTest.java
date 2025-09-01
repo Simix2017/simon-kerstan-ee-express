@@ -18,6 +18,8 @@ class EeExpressApplicationIntegrationTest {
     @Test
     @DisplayName("Run a test application in the test package -> Should run the application")
     void testRun() {
+        System.setProperty("server.alternative_port", "9090");
+
         final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
                                                                              "de.simonkerstan.ee.core.test");
         EeExpressApplication.run(applicationConfiguration);
@@ -25,6 +27,7 @@ class EeExpressApplicationIntegrationTest {
         assertEquals("Hello World!", TestStaticHolder.getTestProperty());
         assertEquals("CoolFrameworkBean", TestStaticHolder.getTestBeanProviderProperty());
         assertEquals(8080, TestStaticHolder.getTestConfigurationProperty());
+        assertEquals(9090, TestStaticHolder.getTestConfigurationProperty2());
     }
 
     @Test
