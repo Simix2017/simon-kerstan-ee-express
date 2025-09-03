@@ -20,14 +20,18 @@ class EeExpressApplicationIntegrationTest {
     void testRun() {
         System.setProperty("server.alternative_port", "9090");
 
-        final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
+        final var applicationConfiguration = EeExpressApplication.initialize(new String[]{"--integration.test=true"},
                                                                              "de.simonkerstan.ee.core.test");
         EeExpressApplication.run(applicationConfiguration);
         // If the following properties are set, the application (and CDI context with all beans) was set up successfully
         assertEquals("Hello World!", TestStaticHolder.getTestProperty());
         assertEquals("CoolFrameworkBean", TestStaticHolder.getTestBeanProviderProperty());
-        assertEquals(8080, TestStaticHolder.getTestConfigurationProperty());
-        assertEquals(9090, TestStaticHolder.getTestConfigurationProperty2());
+
+        // Test different configuration sources
+        assertTrue(TestStaticHolder.isTestCommandlineConfigurationProperty());
+        assertEquals(9090, TestStaticHolder.getTestSystemPropertiesConfigurationProperty());
+        assertEquals("Cool ;)", TestStaticHolder.getTestCustomSourceConfigurationProperty());
+        assertEquals(8080, TestStaticHolder.getTestApplicationPropertiesClasspathConfigurationProperty());
     }
 
     @Test

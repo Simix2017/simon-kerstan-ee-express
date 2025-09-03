@@ -34,7 +34,10 @@ final class ConfigurationPropertyResolver {
     public <T> Optional<T> resolveConfigurationValue(String propertyName, Class<T> propertyType) {
         return (Optional<T>) this.configurationValueProvider.apply(propertyName)
                 .map(value -> {
-                    if (propertyType == int.class || propertyType == Integer.class) {
+                    if (propertyType == boolean.class || propertyType == Boolean.class) {
+                        // Boolean
+                        return parseBool(value);
+                    } else if (propertyType == int.class || propertyType == Integer.class) {
                         // Integer
                         return parseInt(value);
                     }
@@ -45,6 +48,10 @@ final class ConfigurationPropertyResolver {
                 .stream()
                 .flatMap(Optional::stream)
                 .findAny();
+    }
+
+    private static Optional<Boolean> parseBool(String value) {
+        return Optional.of(Boolean.parseBoolean(value));
     }
 
     private static Optional<Integer> parseInt(String value) {

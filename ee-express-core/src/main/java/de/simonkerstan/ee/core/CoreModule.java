@@ -8,10 +8,7 @@ package de.simonkerstan.ee.core;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
-import de.simonkerstan.ee.core.configuration.Configuration;
-import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
-import de.simonkerstan.ee.core.configuration.PropertiesFileConfigurationProvider;
-import de.simonkerstan.ee.core.configuration.SystemPropertiesConfigurationProvider;
+import de.simonkerstan.ee.core.configuration.*;
 import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 
@@ -24,6 +21,8 @@ import java.util.List;
  */
 public class CoreModule implements FrameworkModule {
 
+    private final ConfigurationSourceHook configurationSourceHook = new ConfigurationSourceHook();
+
     @Override
     public void init(Configuration configuration) {
         if (configuration instanceof DefaultConfiguration defaultConfiguration) {
@@ -34,6 +33,10 @@ public class CoreModule implements FrameworkModule {
             final var systemPropertiesConfigurationProvider = new SystemPropertiesConfigurationProvider();
             defaultConfiguration.addConfigurationProvider(systemPropertiesConfigurationProvider);
 
+            // Add custom sources (third source)
+            this.configurationSourceHook.getConfigurationSources()
+                    .forEach(defaultConfiguration::addConfigurationProvider);
+
             // Add the properties file (last source)
             final var propertiesFileConfigurationProvider = new PropertiesFileConfigurationProvider();
             defaultConfiguration.addConfigurationProvider(propertiesFileConfigurationProvider);
@@ -42,7 +45,7 @@ public class CoreModule implements FrameworkModule {
 
     @Override
     public List<ClassHook> classHooks() {
-        return List.of();
+        return List.of(this.configurationSourceHook);
     }
 
     @Override

@@ -40,13 +40,8 @@ public class MyService {
 }
 ```
 
-There are different layers that are used to retrieve the configuration properties. For the previous example, you could
-set the `my.value` property in the following ways:
-
-- In the `application.properties` file in the `src/main/resources` folder. (`my.value = xyz`)
-- As an environment variable (`MY_VALUE=xyz"`)
-- As a system property (`-Dmy.value=xyz`)
-- As a command line argument (`--my.value=xyz`)
+There are different layers that are used to retrieve the configuration properties. See the sections below for more
+details.
 
 ## Configuration sources
 
@@ -70,3 +65,33 @@ ways to use command line arguments:
 ### System properties
 
 System properties are loaded by the JVM automatically and can also be used to set configuration properties.
+
+### Custom sources
+
+Custom sources are custom implementations of the `ConfigurationProvider` interface that are annotated with
+`@ConfigurationSource`. They are automatically loaded and bootstrapped by the framework.
+
+See the example below for more details:
+
+```java
+package com.example;
+
+import de.simonkerstan.ee.core.annotations.ConfigurationSource;
+import de.simonkerstan.ee.core.configuration.ConfigurationProvider;
+
+import java.util.Optional;
+
+@ConfigurationSource
+public class MyConfigurationProvider implements ConfigurationProvider {
+
+    @Override
+    public Optional<String> getConfigurationValue(String propertyName) {
+        if ("my_property".equals(propertyName)) {
+            return Optional.of("Example value");
+        }
+
+        return Optional.empty();
+    }
+
+}
+```

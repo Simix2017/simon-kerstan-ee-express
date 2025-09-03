@@ -19,10 +19,10 @@ class CommandLineConfigurationProviderUnitTest {
     @DisplayName("Test command line with equal sign -> Should return the configuration")
     void testEqualOption() {
         final var tested = new CommandLineConfigurationProvider(
-                new String[]{"--testCamel=value", "sthElse", "--test_2=xyz"});
+                new String[]{"--testCamel=value", "sthElse", "--test.test_2=xyz"});
 
         assertEquals(Optional.of("value"), tested.getConfigurationValue("testCamel"));
-        assertEquals(Optional.of("xyz"), tested.getConfigurationValue("test_2"));
+        assertEquals(Optional.of("xyz"), tested.getConfigurationValue("test.test_2"));
         assertTrue(tested.getConfigurationValue("sthElse")
                            .isEmpty());
     }

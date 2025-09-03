@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
  */
 final class CommandLineConfigurationProvider implements ConfigurationProvider {
 
-    private static final Pattern PROPERTY_PATTERN = Pattern.compile("^--([a-zA-Z0-9_]+)$");
-    private static final Pattern PROPERTY_VALUE_PATTERN = Pattern.compile("^--([a-zA-Z0-9_]+)=(.+)$");
+    private static final Pattern PROPERTY_PATTERN = Pattern.compile("^--([a-zA-Z0-9._]+)$");
+    private static final Pattern PROPERTY_VALUE_PATTERN = Pattern.compile("^--([a-zA-Z0-9._]+)=(.+)$");
 
     private final Map<String, String> configurationValues = new HashMap<>();
 

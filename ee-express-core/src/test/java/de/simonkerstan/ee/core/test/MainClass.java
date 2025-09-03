@@ -33,10 +33,21 @@ public class MainClass implements Runnable {
     @Override
     public void run() {
         try {
-            TestStaticHolder.setTestConfigurationProperty(
-                    this.configuration.getRequiredPropertyValue("server.port", Integer.class));
-            TestStaticHolder.setTestConfigurationProperty2(
+            // Commandline configuration provider
+            TestStaticHolder.setTestCommandlineConfigurationProperty(
+                    this.configuration.getRequiredPropertyValue("integration.test", Boolean.class));
+
+            // System properties configuration provider
+            TestStaticHolder.setTestSystemPropertiesConfigurationProperty(
                     this.configuration.getRequiredPropertyValue("server.alternative_port", Integer.class));
+
+            // Custom configuration provider
+            TestStaticHolder.setTestCustomSourceConfigurationProperty(
+                    this.configuration.getRequiredPropertyValue("my_property", String.class));
+
+            // Application properties (classpath) configuration provider
+            TestStaticHolder.setTestApplicationPropertiesClasspathConfigurationProperty(
+                    this.configuration.getRequiredPropertyValue("server.port", Integer.class));
         } catch (MissingConfigurationPropertyException e) {
             fail("Cannot read required configuration property", e);
         }

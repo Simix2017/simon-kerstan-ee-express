@@ -23,10 +23,18 @@ public class TestStaticHolder {
 
     @Getter
     @Setter
-    private static int testConfigurationProperty;
+    private static int testSystemPropertiesConfigurationProperty;
 
     @Getter
     @Setter
-    private static int testConfigurationProperty2;
+    private static boolean testCommandlineConfigurationProperty;
+
+    @Getter
+    @Setter
+    private static String testCustomSourceConfigurationProperty;
+
+    @Getter
+    @Setter
+    private static int testApplicationPropertiesClasspathConfigurationProperty;
 
 }
