@@ -18,7 +18,8 @@ Dependency injection (based
 on [Jakarta Dependency Injection 2.0](https://jakarta.ee/specifications/dependency-injection/2.0/)) works without any
 configuration. Beans are automatically discovered inside the given bootstrap packages (and their recursive subpackages)
 in the application initialization. To be automatically discovered, a bean must have exactly one constructor annotated
-with `@javax.inject.Inject` or is required in another bean with a constructor annotated with `@javax.inject.Inject`.
+with `@javax.inject.Inject` or must be required in another bean with a constructor annotated with
+`@javax.inject.Inject`.
 
 ## Logging
 

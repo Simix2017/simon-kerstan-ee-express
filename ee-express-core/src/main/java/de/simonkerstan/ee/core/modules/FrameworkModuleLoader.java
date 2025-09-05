@@ -9,7 +9,6 @@ import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -45,8 +44,10 @@ public final class FrameworkModuleLoader {
                 .map(String::trim)
                 .peek(resource -> log.debug("Found possible framework module resource {}", resource))
                 .filter(FrameworkModuleLoader::isFrameworkModuleResourceEntry)
-                .map(resourceEntryName -> getModuleClassName(resourceEntryName, classpathItem))
+                .map(resourceEntryName -> getModuleDefinition(resourceEntryName, classpathItem))
                 .filter(Objects::nonNull)
+                .sorted()
+                .map(FrameworkModuleDefinition::className)
                 .map(FrameworkModuleLoader::instantiateFrameworkModuleClass)
                 .filter(Objects::nonNull)
                 .toList();
@@ -56,18 +57,21 @@ public final class FrameworkModuleLoader {
         return resourceEntryName.endsWith(".module");
     }
 
-    private static String getModuleClassName(String resourceEntryName, ClasspathItem classpathItem) {
+    private static FrameworkModuleDefinition getModuleDefinition(String resourceEntryName,
+                                                                 ClasspathItem classpathItem) {
         try (final var is = classpathItem.getResourceAsStream(FRAMEWORK_MODULES_DIRECTORY + "/" + resourceEntryName)) {
             if (is != null) {
                 // Must be the case because the resource exists
                 final var reader = new BufferedReader(new InputStreamReader(is));
-                return reader.readLine()
-                        .trim();
+                final var className = reader.readLine();
+                final var priority = Integer.parseInt(reader.readLine());
+                return new FrameworkModuleDefinition(className, priority);
             }
 
             log.warn("Cannot read resource {}. This should be impossible...", resourceEntryName);
-        } catch (IOException e) {
-            // Impossible
+        } catch (Exception e) {
+            // Catch generic exception because we cannot know the exact type of the exception
+            log.warn("Cannot read framework module definition {}.", resourceEntryName, e);
         }
 
         return null;
@@ -88,6 +92,23 @@ public final class FrameworkModuleLoader {
             log.warn("Cannot instantiate framework module class {}", className, e);
             return null;
         }
+    }
+
+    /**
+     * Definition of a framework module (loaded from classpath).
+     *
+     * @param className       Class name of the module
+     * @param loadingPriority Priority of the module (the lowest number means the highest loadingPriority)
+     */
+    private record FrameworkModuleDefinition(String className,
+                                             int loadingPriority) implements Comparable<FrameworkModuleDefinition> {
+
+        @Override
+        public int compareTo(FrameworkModuleDefinition o) {
+            // Ascending order
+            return Integer.compare(this.loadingPriority, o.loadingPriority);
+        }
+
     }
 
 }

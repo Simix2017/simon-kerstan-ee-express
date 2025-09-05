@@ -78,8 +78,7 @@ public final class EeExpressApplication {
         // Scan for classes and methods
         classScanner.scan();
 
-        // Initialize all framework modules
-        // TODO: sort framework modules by priority (so that configuration is initialized first)
+        // Initialize all framework modules (already sorted by priority)
         modules.forEach(module -> module.init(configuration));
 
         // Create all beans and set up the CDI context
