@@ -31,17 +31,17 @@ This project is compatible with Java 17 and above. Currently, the framework is b
 
 ### EE Express
 
-This project bundles all modules of this framework into one dependency. It only makes sense for web applications.
+This project bundles all web modules of this framework into one dependency. You can use this dependency instead of a
+list of all web modules in your `build.gradle` file.
 
 ### EE Express Core
 
-[Module documentation](docs/core.md)
+_Base module_ | [Module documentation](docs/core.md)
 
-Core Jakarta EE runtime with Jakarta EE CDI and configuration APIs. This can be used for non-web applications and has
-APIs for bootstrapping the application. Every other module of the framework is based on this module.
+Core Jakarta EE runtime with Jakarta EE CDI and configuration APIs. This can be used for web and non-web applications
+and has APIs for bootstrapping applications. Every other module of the framework is based on this module.
 
-Besides core APIs from Jakarta EE, this module also provides logging via SLF4J (which uses Logback Classic behind the
-scenes).
+Besides core APIs from Jakarta EE, this module also provides logging support.
 
 The CDI implementation does only support dependency injection via annotations currently and does not support the full
 CDI specification.
@@ -52,9 +52,12 @@ The following Jakarta EE (and own) APIs are available inside this module:
 - [Jakarta JSON Binding 3.0](https://jakarta.ee/specifications/jsonb/3.0/)
 - [Jakarta JSON Processing 2.1](https://jakarta.ee/specifications/jsonp/2.1/)
 - [Jakarta XML Binding 4.0](https://jakarta.ee/specifications/xml-binding/4.0/)
+- [SLF4J](https://slf4j.org/)
 - [Configuration API](docs/core/configuration.md)
 
 ### EE Express Validation
+
+_Universal module_ | [Module documentation](docs/validation.md)
 
 Validation API for Jakarta EE. A configured `Validator` is automatically provided in the CDI context.
 
@@ -64,11 +67,17 @@ The following Jakarta EE APIs are available inside this module:
 
 ### EE Express Web
 
-[Module documentation](docs/web.md)
+_Web module_ | [Module documentation](docs/web.md)
 
-Web Jakarta EE runtime with a Servlet and JAX-RS runtime. Currently, Tomcat is used as the embedded web server and
-Jersey is used as the JAX-RS implementation. If using this module, you do not need to bootstrap the application
-yourself. Instead, you can start the server. Please note that JAX-RS is automatically enabled for path `/api/**`.
+Web Jakarta EE runtime with a Servlet container and a JAX-RS runtime. Different to the initialization of standalone
+applications, a server must be created with an initialized application context. This server can be started after adding
+custom servlets and filters. For more information, have a look at
+the [web application getting started guide](#web-application).
+
+JAX-RS is automatically enabled with all available JAX-RS resources inside the bootstrap packages (and their recursive
+subpackages) for path `/api/**`.
+
+Currently, Tomcat is used as the embedded web server and Jersey is used as the JAX-RS implementation.
 
 The following Jakarta EE APIs are available inside this module:
 
@@ -85,7 +94,7 @@ file like this:
 ```groovy
 plugins {
     id 'java'
-    id('io.freefair.lombok') version '8.14'
+    id('io.freefair.lombok') version '8.14.2'
 }
 
 group = 'com.example'

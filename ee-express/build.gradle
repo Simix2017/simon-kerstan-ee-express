@@ -9,8 +9,7 @@ repositories {
 
 dependencies {
     api project(':ee-express-core')
-    // TODO: implement EE Express Validation
-    //api project(':ee-express-validation')
+    api project(':ee-express-validation')
     api project(':ee-express-web')
 }
 
