@@ -5,6 +5,7 @@
 
 package de.simonkerstan.ee.validation;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
@@ -27,7 +28,7 @@ public class ValidationModule implements FrameworkModule {
     private Validator validator;
 
     @Override
-    public void init(Configuration configuration) {
+    public void init(Configuration configuration, ClasspathItem classpathItem) {
         // The validator factory is not closed because the validator instance is reused for the whole application
         // lifetime.
         final var validatorFactory = Validation.byDefaultProvider()

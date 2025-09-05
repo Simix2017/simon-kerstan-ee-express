@@ -108,4 +108,5 @@ variable `MY_VALUE` is mapped to the configuration property `my.value`.
 
 ### application.properties file in classpath
 
-TODO: add handling of `application.properties` file
+From the classpath a file named `application.properties` is loaded. This file can be used to set configuration
+properties.

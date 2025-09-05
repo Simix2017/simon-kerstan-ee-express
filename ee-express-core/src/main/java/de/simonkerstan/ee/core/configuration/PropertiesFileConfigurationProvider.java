@@ -5,7 +5,10 @@
 
 package de.simonkerstan.ee.core.configuration;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * Configuration provider that reads the configuration from the command line.
@@ -14,14 +17,15 @@ import java.util.Optional;
  */
 public final class PropertiesFileConfigurationProvider implements ConfigurationProvider {
 
+    private final Properties properties = new Properties();
+
+    public PropertiesFileConfigurationProvider(InputStream propertiesFile) throws IOException {
+        this.properties.load(propertiesFile);
+    }
+
     @Override
     public Optional<String> getConfigurationValue(String propertyName) {
-        // TODO
-        if (propertyName.equals("server.port")) {
-            return Optional.of("8080");
-        }
-
-        return Optional.empty();
+        return Optional.ofNullable(this.properties.getProperty(propertyName));
     }
 
 }

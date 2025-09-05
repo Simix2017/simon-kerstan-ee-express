@@ -79,7 +79,7 @@ public final class EeExpressApplication {
         classScanner.scan();
 
         // Initialize all framework modules (already sorted by priority)
-        modules.forEach(module -> module.init(configuration));
+        modules.forEach(module -> module.init(configuration, classpathItem));
 
         // Create all beans and set up the CDI context
         modules.stream()

@@ -1,5 +1,6 @@
 package de.simonkerstan.ee.core.modules.test;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
@@ -17,7 +18,7 @@ public class TestModule2 implements FrameworkModule {
     private CoolFrameworkBean coolFrameworkBean;
 
     @Override
-    public void init(Configuration configuration) {
+    public void init(Configuration configuration, ClasspathItem classpathItem) {
         // If the framework bean is set, the module was properly initialized.
         this.coolFrameworkBean = new CoolFrameworkBean("Never instantiated bean");
     }

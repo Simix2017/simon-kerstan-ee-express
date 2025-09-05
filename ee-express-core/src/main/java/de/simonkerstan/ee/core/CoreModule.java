@@ -5,13 +5,16 @@
 
 package de.simonkerstan.ee.core;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.configuration.*;
 import de.simonkerstan.ee.core.di.BeanProvider;
+import de.simonkerstan.ee.core.exceptions.InvalidConfigurationSourceException;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,7 +27,7 @@ public class CoreModule implements FrameworkModule {
     private final ConfigurationSourceHook configurationSourceHook = new ConfigurationSourceHook();
 
     @Override
-    public void init(Configuration configuration) {
+    public void init(Configuration configuration, ClasspathItem classpathItem) {
         if (configuration instanceof DefaultConfiguration defaultConfiguration) {
             // Dirty hack to get the configuration with an automatically registered provider of command-line arguments.
             // If the configuration has the wrong format, nothing will be done in this module
@@ -41,9 +44,16 @@ public class CoreModule implements FrameworkModule {
             final var environmentConfigurationProvider = new EnvironmentConfigurationProvider();
             defaultConfiguration.addConfigurationProvider(environmentConfigurationProvider);
 
-            // Add the properties file (last source)
-            final var propertiesFileConfigurationProvider = new PropertiesFileConfigurationProvider();
-            defaultConfiguration.addConfigurationProvider(propertiesFileConfigurationProvider);
+            // Add the properties file from the classpath (last source)
+            if (classpathItem.isResourceExisting("application.properties")) {
+                try (final var is = classpathItem.getResourceAsStream("application.properties")) {
+                    final var propertiesFileConfigurationProvider = new PropertiesFileConfigurationProvider(is);
+                    defaultConfiguration.addConfigurationProvider(propertiesFileConfigurationProvider);
+                } catch (IOException e) {
+                    throw new InvalidConfigurationSourceException("Cannot read application.properties from classpath",
+                                                                  e);
+                }
+            }
         }
     }
 

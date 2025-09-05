@@ -5,6 +5,7 @@
 
 package de.simonkerstan.ee.core.modules;
 
+import de.simonkerstan.ee.core.classpath.ClasspathItem;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
@@ -24,8 +25,9 @@ public interface FrameworkModule {
      * Initialize the module. This method will be called after class scanning, so the results of the hooks can be used.
      *
      * @param configuration Configuration of the framework
+     * @param classpathItem Classpath item (wrapper to access all classpath resources)
      */
-    void init(Configuration configuration);
+    void init(Configuration configuration, ClasspathItem classpathItem);
 
     /**
      * Get all class hooks of this module.
