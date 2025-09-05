@@ -37,6 +37,10 @@ public class CoreModule implements FrameworkModule {
             this.configurationSourceHook.getConfigurationSources()
                     .forEach(defaultConfiguration::addConfigurationProvider);
 
+            // Add environment variables (fifth source)
+            final var environmentConfigurationProvider = new EnvironmentConfigurationProvider();
+            defaultConfiguration.addConfigurationProvider(environmentConfigurationProvider);
+
             // Add the properties file (last source)
             final var propertiesFileConfigurationProvider = new PropertiesFileConfigurationProvider();
             defaultConfiguration.addConfigurationProvider(propertiesFileConfigurationProvider);

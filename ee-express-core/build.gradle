@@ -38,6 +38,9 @@ tasks.withType(Test).configureEach {
     if (mockitoAgent) {
         jvmArgs "-javaagent:${mockitoAgent.absolutePath}"
     }
+
+    // Needed in de.simonkerstan.ee.core.EeExpressApplicationIntegrationTest
+    environment "MY_ENV_VARIABLE", "Hello World!"
 }
 
 java {

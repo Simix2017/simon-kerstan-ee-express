@@ -31,6 +31,7 @@ class EeExpressApplicationIntegrationTest {
         assertTrue(TestStaticHolder.isTestCommandlineConfigurationProperty());
         assertEquals(9090, TestStaticHolder.getTestSystemPropertiesConfigurationProperty());
         assertEquals("Cool ;)", TestStaticHolder.getTestCustomSourceConfigurationProperty());
+        assertEquals("Hello World!", TestStaticHolder.getTestEnvironmentConfigurationProperty());
         assertEquals(8080, TestStaticHolder.getTestApplicationPropertiesClasspathConfigurationProperty());
     }
 

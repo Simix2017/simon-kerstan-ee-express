@@ -45,6 +45,10 @@ public class MainClass implements Runnable {
             TestStaticHolder.setTestCustomSourceConfigurationProperty(
                     this.configuration.getRequiredPropertyValue("my_property", String.class));
 
+            // Environment configuration provider
+            TestStaticHolder.setTestEnvironmentConfigurationProperty(
+                    this.configuration.getRequiredPropertyValue("my.env.variable", String.class));
+
             // Application properties (classpath) configuration provider
             TestStaticHolder.setTestApplicationPropertiesClasspathConfigurationProperty(
                     this.configuration.getRequiredPropertyValue("server.port", Integer.class));

@@ -35,6 +35,10 @@ public class TestStaticHolder {
 
     @Getter
     @Setter
+    private static String testEnvironmentConfigurationProperty;
+
+    @Getter
+    @Setter
     private static int testApplicationPropertiesClasspathConfigurationProperty;
 
 }

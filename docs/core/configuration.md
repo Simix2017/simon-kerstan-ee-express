@@ -52,7 +52,7 @@ There are different sources of configuration that are loaded in the following or
 3. Custom sources
 4. Configured other configuration files
 5. Environment variables
-6. `application.properties` file
+6. `application.properties` file in classpath
 
 ### Command line arguments
 
@@ -95,3 +95,17 @@ public class MyConfigurationProvider implements ConfigurationProvider {
 
 }
 ```
+
+### Configured other configuration files
+
+TODO: add handling of configuration files
+
+### Environment variables
+
+Environment variables are loaded by the JVM automatically and can also be used to set configuration properties.
+Environment variable names are always uppercase and dots are replaced with underscores. For example, the environment
+variable `MY_VALUE` is mapped to the configuration property `my.value`.
+
+### application.properties file in classpath
+
+TODO: add handling of `application.properties` file
