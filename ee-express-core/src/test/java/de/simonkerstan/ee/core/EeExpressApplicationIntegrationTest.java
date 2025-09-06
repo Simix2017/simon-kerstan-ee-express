@@ -78,4 +78,14 @@ class EeExpressApplicationIntegrationTest {
         assertEquals("true", System.getProperty(MainClass5.class.getName()));
     }
 
+    @Test
+    @DisplayName("There are cyclic dependencies in the test6 package -> Should throw exception")
+    void testRunWithCyclicDependencies() {
+        final var exception = assertThrows(BeanInstantiationException.class,
+                                           () -> EeExpressApplication.initialize(new String[]{},
+                                                                                 "de.simonkerstan.ee.core.test6"));
+        assertTrue(exception.getMessage()
+                           .contains("Cyclic dependency detected"));
+    }
+
 }

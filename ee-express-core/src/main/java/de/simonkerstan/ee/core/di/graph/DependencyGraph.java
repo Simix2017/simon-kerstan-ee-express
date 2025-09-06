@@ -84,6 +84,11 @@ public final class DependencyGraph {
             }
         }
 
+        // Get the number of all beans. If there are more tries than that number to instantiate a bean, a cyclic
+        // dependency exists!
+        final int numberOfBeans = this.nodes.size();
+        final Map<Class<?>, Integer> instantiationTries = new HashMap<>();
+
         // Create a copy of all nodes to allow removing already instantiated beans
         final Map<String, DependencyGraphNode> allNodes = new HashMap<>(this.nodes);
 
@@ -111,6 +116,13 @@ public final class DependencyGraph {
             // Traverse the dependency tree
             DependencyGraphNode node;
             while ((node = queue.poll()) != null) {
+                // Check for instantiation count
+                final int instantiationCount = instantiationTries.computeIfAbsent(node.getType(), _k -> 0) + 1;
+                if (instantiationCount > numberOfBeans) {
+                    throw new BeanInstantiationException("Cyclic dependency detected");
+                }
+                instantiationTries.put(node.getType(), instantiationCount);
+
                 // Check if the bean has all dependencies instantiated already
                 boolean hasAllDependenciesInstantiated = true;
                 for (final var dep : node.getDependencies()) {
@@ -143,7 +155,6 @@ public final class DependencyGraph {
                 }
             }
         }
-        // TODO: check for cyclic dependencies
 
         return beans;
     }
