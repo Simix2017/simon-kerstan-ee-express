@@ -8,8 +8,8 @@ package de.simonkerstan.ee.core.di.graph;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ final class DependencyGraphNode {
     private final Class<?> type;
     @Getter
     private final BeanCreationInformation beanCreationInformation;
-    private final List<DependencyGraphNode> dependencies = new ArrayList<>();
+    private final List<DependencyGraphNode> dependencies = new LinkedList<>();
 
     /**
      * Add a dependency to the node.
@@ -42,6 +42,35 @@ final class DependencyGraphNode {
      */
     public List<DependencyGraphNode> getDependencies() {
         return Collections.unmodifiableList(this.dependencies);
+    }
+
+    /**
+     * Remove a dependency from the node.
+     *
+     * @param dependency Dependency to be removed
+     */
+    public void removeDependency(DependencyGraphNode dependency) {
+        this.dependencies.remove(dependency);
+    }
+
+    /**
+     * Remove a dependency from the node if it exists.
+     *
+     * @param dependency Dependency to be removed
+     * @return {@code true} if the dependency was removed, {@code false} otherwise
+     */
+    public boolean removeDependencyIfExisting(DependencyGraphNode dependency) {
+        final var iterator = this.dependencies.iterator();
+        while (iterator.hasNext()) {
+            final var next = iterator.next();
+            if (next == dependency) {
+                // We check for identity because we know the exact object
+                iterator.remove();
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

@@ -36,11 +36,8 @@ public final class DependencyGraph {
      * @param priority                Priority of the bean
      * @param type                    Type of the bean
      * @param beanCreationInformation Bean information
-     * @param dependencies            Dependencies of the bean
      */
-    public void addBean(int priority, Class<?> type, BeanCreationInformation beanCreationInformation,
-                        Class<?>[] dependencies) {
-        // TODO: Check if bean already exists
+    public void addBean(int priority, Class<?> type, BeanCreationInformation beanCreationInformation) {
         Arrays.stream(ProvidedTypesResolver.resolve(type))
                 // Add all resolved types to the graph
                 .forEach(resolvedType -> this.insertOneBeanType(priority, resolvedType, beanCreationInformation, true));
@@ -151,19 +148,53 @@ public final class DependencyGraph {
         return beans;
     }
 
-    private void insertOneBeanType(int priority, Class<?> type, BeanCreationInformation beanCreationInformation,
-                                   boolean removeFromUnresolvedDependencies) {
+    /**
+     * Insert a bean type into the graph.
+     *
+     * @param priority                         Priority of the bean (the lowest value means the highest priority)
+     * @param type                             Bean type
+     * @param beanCreationInformation          Bean creation information
+     * @param removeFromUnresolvedDependencies {@code true} if the bean should be removed from the unresolved
+     *                                         dependencies list, {@code false} otherwise
+     * @return {@code true} if the bean was inserted, {@code false} if the bean already exists
+     */
+    private boolean insertOneBeanType(int priority, Class<?> type, BeanCreationInformation beanCreationInformation,
+                                      boolean removeFromUnresolvedDependencies) {
         final var beanClassName = type.getName();
+        final var existingNode = this.nodes.get(beanClassName);
+        if (existingNode != null) {
+            // Bean already exists, we must compare the priority
+            if (Math.max(priority, 0) < existingNode.getPriority()) {
+                // Priority is lower, so we replace the existing node
+                // We remove the existing node here and go on with the "default insert logic"
+
+                // Remove the existing node from all other nodes' dependencies and add it to the list of unresolved
+                // dependencies.
+                this.nodes.forEach((className, node) -> {
+                    if (node != existingNode) {
+                        final boolean hadDependency = node.removeDependencyIfExisting(existingNode);
+                        if (hadDependency) {
+                            this.unresolvedDependencies.computeIfAbsent(beanClassName, _k -> new ArrayList<>())
+                                    .add(node);
+                        }
+                    }
+                });
+
+                // Remove the existing node
+                this.nodes.remove(beanClassName);
+            } else {
+                // Priority is higher, so we do not insert the bean
+                return false;
+            }
+        }
 
         // Create a new node for the bean
         final var node = new DependencyGraphNode(priority, type, beanCreationInformation);
         this.nodes.put(beanClassName, node);
 
         // Check if other beans have this bean as unsatisfied dependency
-        final var unsatisfiedConsumers = this.unresolvedDependencies.get(beanClassName);
-        if (unsatisfiedConsumers != null) {
-            unsatisfiedConsumers.forEach(consumer -> consumer.addDependency(node));
-        }
+        this.unresolvedDependencies.computeIfAbsent(beanClassName, _k -> List.of())
+                .forEach(consumer -> consumer.addDependency(node));
         if (removeFromUnresolvedDependencies) {
             this.unresolvedDependencies.remove(beanClassName);
         }
@@ -182,6 +213,9 @@ public final class DependencyGraph {
                 .forEach(dependencyName -> this.unresolvedDependencies.computeIfAbsent(dependencyName,
                                                                                        key -> new ArrayList<>())
                         .add(node));
+
+        // Node was inserted successfully
+        return true;
     }
 
     /**
@@ -203,10 +237,14 @@ public final class DependencyGraph {
                     .ifPresent(entry1 -> {
                         // Class with a default constructor for this bean exists
                         try {
-                            this.insertOneBeanType(0, entry1.getKey(), new ConstructorBeanCreationInformation(
-                                    entry1.getValue()
-                                            .getDeclaredConstructor(), false), false);
-                            iterator.remove();
+                            final boolean inserted = this.insertOneBeanType(Integer.MAX_VALUE, entry1.getKey(),
+                                                                            new ConstructorBeanCreationInformation(
+                                                                                    entry1.getValue()
+                                                                                            .getDeclaredConstructor(),
+                                                                                    false), false);
+                            if (inserted) {
+                                iterator.remove();
+                            }
                         } catch (NoSuchMethodException e) {
                             // Impossible
                         }

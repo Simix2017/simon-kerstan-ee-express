@@ -5,11 +5,11 @@
 
 package de.simonkerstan.ee.core.di;
 
+import de.simonkerstan.ee.core.annotations.BeanPriority;
 import de.simonkerstan.ee.core.clazz.ClassHook;
 import de.simonkerstan.ee.core.clazz.ClassInterfacesHook;
 import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
-import de.simonkerstan.ee.core.di.graph.ConstructorBeanCreationInformation;
 import de.simonkerstan.ee.core.di.graph.DependencyGraph;
 import de.simonkerstan.ee.core.di.graph.ObjectBeanCreationInformation;
 import jakarta.inject.Inject;
@@ -34,7 +34,10 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
-    private final Map<Class<?>, BeanInformation> unresolvedBeans = new HashMap<>();
+    /**
+     * Map of all unprocessed beans. (concrete implementation class -> bean information)
+     */
+    private final Map<Class<?>, BeanInformation> unprocessedBeans = new HashMap<>();
     private final DependencyGraph dependencyGraph = new DependencyGraph();
 
     /*
@@ -45,7 +48,7 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends Annotation>[] getClassAnnotations() {
-        return new Class[]{Singleton.class};
+        return new Class[]{Singleton.class, BeanPriority.class};
     }
 
     @SuppressWarnings("unchecked")
@@ -63,12 +66,13 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
     @Override
     public void processClass(Class<?> clazz, Class<? extends Annotation> annotation, Annotation annotationInstance) {
         log.debug("Processing annotation {} from class {} constructor", annotation.getName(), clazz.getName());
-        final var beanInformation = this.unresolvedBeans.computeIfAbsent(clazz, _clazz -> new BeanInformation());
+        final var beanInformation = this.unprocessedBeans.computeIfAbsent(clazz, _clazz -> new BeanInformation());
         if (annotation == Singleton.class) {
-            // Singleton bean constructor
+            // Singleton bean (class annotation)
             beanInformation.setSingleton(true);
-            beanInformation.setCreationInformation(ConstructorBeanCreationInformation.of(
-                    (ConstructorBeanCreationInformation) beanInformation.getCreationInformation(), true));
+        } else if (annotation == BeanPriority.class) {
+            // Bean priority (class annotation)
+            beanInformation.setPriority(((BeanPriority) annotationInstance).value());
         }
     }
 
@@ -91,17 +95,15 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
         log.debug("Processing constructor annotation {} from class {} constructor", annotation.getName(),
                   constructor.getDeclaringClass()
                           .getName());
-        final var beanInformation = this.unresolvedBeans.computeIfAbsent(constructor.getDeclaringClass(),
-                                                                         _clazz -> new BeanInformation());
+        final var beanInformation = this.unprocessedBeans.computeIfAbsent(constructor.getDeclaringClass(),
+                                                                          _clazz -> new BeanInformation());
         if (annotation == Inject.class) {
             // Bean constructor for injection
-            beanInformation.setDependencies(Arrays.asList(constructor.getParameterTypes()));
-            beanInformation.setCreationInformation(
-                    new ConstructorBeanCreationInformation(constructor, beanInformation.isSingleton()));
+            beanInformation.setBeanType(constructor.getDeclaringClass());
+            beanInformation.setConstructor(constructor);
         } else if (annotation == Singleton.class) {
-            // Singleton bean constructor
+            // Singleton bean (constructor annotation)
             beanInformation.setSingleton(true);
-            beanInformation.setCreationInformation(new ConstructorBeanCreationInformation(constructor, true));
         }
     }
 
@@ -117,8 +119,7 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
      */
     public void addBeanProvider(BeanProvider<?> beanProvider) {
         final var beanCreationInformation = new ObjectBeanCreationInformation(beanProvider.instance());
-        this.dependencyGraph.addBean(beanProvider.priority(), beanProvider.type(), beanCreationInformation,
-                                     new Class[]{});
+        this.dependencyGraph.addBean(beanProvider.priority(), beanProvider.type(), beanCreationInformation);
     }
 
     /**
@@ -146,10 +147,9 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
      * Process all scanned classes and methods to create beans and contexts.
      */
     public void postProcess() {
-        this.unresolvedBeans.forEach((clazz, beanInformation) -> {
-            this.dependencyGraph.addBean(beanInformation.getPriority(), clazz, beanInformation.getCreationInformation(),
-                                         beanInformation.getDependencies()
-                                                 .toArray(Class[]::new));
+        this.unprocessedBeans.forEach((clazz, beanInformation) -> {
+            this.dependencyGraph.addBean(beanInformation.getPriority(), clazz,
+                                         beanInformation.createBeanCreationInformation());
         });
 
         final var beans = this.dependencyGraph.instantiateBeans();

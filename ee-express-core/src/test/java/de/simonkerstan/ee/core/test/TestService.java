@@ -5,24 +5,16 @@
 
 package de.simonkerstan.ee.core.test;
 
-import jakarta.inject.Inject;
-
 /**
- * Test service for testing the application bootstrapper.
+ * Test service interface used for priority testing.
  */
-public class TestService {
-
-    @Inject
-    public TestService() {
-    }
+public interface TestService {
 
     /**
      * Return a hello-world message for unit testing.
      *
      * @return Hello World!
      */
-    public String helloWorld() {
-        return "Hello World!";
-    }
+    String helloWorld();
 
 }

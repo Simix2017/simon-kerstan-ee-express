@@ -21,14 +21,12 @@ class DependencyGraphUnitTest {
 
         // Add a class with unresolved dependencies
         tested.addBean(0, MainClass.class,
-                       new ConstructorBeanCreationInformation(MainClass.class.getConstructor(TestService.class), true),
-                       new Class<?>[]{TestService.class});
+                       new ConstructorBeanCreationInformation(MainClass.class.getConstructor(TestService.class), true));
         assertTrue(tested.hasUnresolvedDependencies());
 
         // Add the dependency
         tested.addBean(0, TestService.class,
-                       new ConstructorBeanCreationInformation(TestService.class.getConstructor(), true),
-                       new Class<?>[]{});
+                       new ConstructorBeanCreationInformation(TestService.class.getConstructor(), true));
 
         // Add a class with a default constructor
         assertFalse(tested.hasUnresolvedDependencies());
@@ -41,12 +39,9 @@ class DependencyGraphUnitTest {
 
         // Add beans
         tested.addBean(0, MainClass2.class, new ConstructorBeanCreationInformation(
-                               MainClass2.class.getConstructor(TestService.class, BeanWithDefaultConstructor.class),
-                               true),
-                       new Class<?>[]{TestService.class});
+                MainClass2.class.getConstructor(TestService.class, BeanWithDefaultConstructor.class), true));
         tested.addBean(0, TestService.class,
-                       new ConstructorBeanCreationInformation(TestService.class.getConstructor(), true),
-                       new Class<?>[]{});
+                       new ConstructorBeanCreationInformation(TestService.class.getConstructor(), true));
 
         // Add a class with a default constructor
         tested.addDefaultConstructorClass(BeanWithDefaultConstructor.class,
@@ -72,17 +67,13 @@ class DependencyGraphUnitTest {
 
         // Add beans
         tested.addBean(0, SingletonA.class,
-                       new ConstructorBeanCreationInformation(SingletonA.class.getConstructor(), true),
-                       new Class<?>[]{});
+                       new ConstructorBeanCreationInformation(SingletonA.class.getConstructor(), true));
         tested.addBean(0, SingletonB.class,
-                       new ConstructorBeanCreationInformation(SingletonB.class.getConstructor(), true),
-                       new Class<?>[]{});
+                       new ConstructorBeanCreationInformation(SingletonB.class.getConstructor(), true));
         tested.addBean(0, TestSingletons1.class, new ConstructorBeanCreationInformation(
-                               TestSingletons1.class.getConstructor(SingletonA.class, SingletonB.class), true),
-                       new Class<?>[]{SingletonA.class, SingletonB.class});
+                TestSingletons1.class.getConstructor(SingletonA.class, SingletonB.class), true));
         tested.addBean(0, TestSingletons2.class, new ConstructorBeanCreationInformation(
-                               TestSingletons2.class.getConstructor(SingletonA.class, SingletonB.class), true),
-                       new Class<?>[]{SingletonA.class, SingletonB.class});
+                TestSingletons2.class.getConstructor(SingletonA.class, SingletonB.class), true));
 
         // Instantiate the beans
         final var result = tested.instantiateBeans();
@@ -90,6 +81,26 @@ class DependencyGraphUnitTest {
         final TestSingletons2 testSingletons2 = (TestSingletons2) result.get(TestSingletons2.class);
         assertSame(testSingletons1.getSingletonA(), testSingletons2.getSingletonA());
         assertSame(testSingletons1.getSingletonB(), testSingletons2.getSingletonB());
+    }
+
+    @Test
+    @DisplayName("Add same bean types with different priorities -> Should instantiate the highest priority beans")
+    void testPriority() throws NoSuchMethodException {
+        final var tested = new DependencyGraph();
+
+        // Add beans
+        tested.addBean(0, Bean50User.class,
+                       new ConstructorBeanCreationInformation(Bean50User.class.getConstructor(Runnable.class), true));
+        tested.addBean(100, Bean100.class,
+                       new ConstructorBeanCreationInformation(Bean100.class.getConstructor(), true));
+        tested.addBean(50, Bean100.class, new ConstructorBeanCreationInformation(Bean50.class.getConstructor(), true));
+
+        // Instantiate the beans
+        final var result = tested.instantiateBeans();
+        final Bean50User bean50User = (Bean50User) result.get(Bean50User.class);
+        final Runnable bean50 = (Runnable) result.get(Runnable.class);
+        assertInstanceOf(Bean50.class, bean50);
+        assertSame(bean50User.getBean50(), bean50);
     }
 
 }

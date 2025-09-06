@@ -21,6 +21,13 @@ in the application initialization. To be automatically discovered, a bean must h
 with `@javax.inject.Inject` or must be required in another bean with a constructor annotated with
 `@javax.inject.Inject`.
 
+Via the custom `@BeanPriority` annotation, beans can be prioritized. The lower the value in the annotation is, the
+higher is the bean priority. The annotation class has a static field `DEFAULT_PRIORITY` which can be used to set the
+default priority. This value is automatically used if no priority is set (e.g., the custom annotation is not present).
+
+All provided types of the framework have a priority of `Integer.MAX_VALUE`. This means that they can always be
+overridden by custom beans.
+
 ## Logging
 
 Logging is provided via [SLF4J](https://slf4j.org/). Behind the scenes, [Logback Classic](https://logback.qos.ch/) is

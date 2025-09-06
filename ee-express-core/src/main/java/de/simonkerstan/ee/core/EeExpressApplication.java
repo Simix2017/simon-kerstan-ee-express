@@ -8,9 +8,7 @@ package de.simonkerstan.ee.core;
 import de.simonkerstan.ee.core.bootstrap.MainApplicationHook;
 import de.simonkerstan.ee.core.classpath.ClasspathResolver;
 import de.simonkerstan.ee.core.clazz.ClassScanner;
-import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
-import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.di.DependencyInjectionHook;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 import de.simonkerstan.ee.core.modules.FrameworkModuleLoader;
@@ -57,7 +55,6 @@ public final class EeExpressApplication {
 
         // Load the configuration and map it to the application context
         final var configuration = new DefaultConfiguration(args);
-        dependencyInjectionHook.addBeanProvider(new BeanProvider<>(Configuration.class, configuration, 0));
 
         // Scan all base packages for dependency injection and module initialization
         final var classScanner = new ClassScanner(bootstrapPackages, classpathItem);

@@ -25,9 +25,12 @@ import java.util.List;
 public class CoreModule implements FrameworkModule {
 
     private final ConfigurationSourceHook configurationSourceHook = new ConfigurationSourceHook();
+    private Configuration configuration;
 
     @Override
     public void init(Configuration configuration, ClasspathItem classpathItem) {
+        this.configuration = configuration;
+
         if (configuration instanceof DefaultConfiguration defaultConfiguration) {
             // Dirty hack to get the configuration with an automatically registered provider of command-line arguments.
             // If the configuration has the wrong format, nothing will be done in this module
@@ -74,7 +77,7 @@ public class CoreModule implements FrameworkModule {
 
     @Override
     public List<BeanProvider<?>> beanProviders() {
-        return List.of();
+        return List.of(new BeanProvider<>(Configuration.class, this.configuration, Integer.MAX_VALUE));
     }
 
 }
