@@ -38,13 +38,13 @@ list of all web modules in your `build.gradle` file.
 
 _Base module_ | [Module documentation](docs/core.md)
 
-Core Jakarta EE runtime with Jakarta EE CDI and configuration APIs. This can be used for web and non-web applications
-and has APIs for bootstrapping applications. Every other module of the framework is based on this module.
+Core Jakarta EE runtime with Jakarta EE Dependency Injection and configuration APIs. This can be used for web and
+non-web applications and has APIs for bootstrapping applications. Every other module of the framework is based on this
+module.
 
 Besides core APIs from Jakarta EE, this module also provides logging support.
 
-The CDI implementation does only support dependency injection via annotations currently and does not support the full
-CDI specification.
+In the future, the module will also provide a full CDI implementation.
 
 The following Jakarta EE (and own) APIs are available inside this module:
 
