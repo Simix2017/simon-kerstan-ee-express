@@ -8,6 +8,7 @@ package de.simonkerstan.ee.core;
 import de.simonkerstan.ee.core.exceptions.BeanInstantiationException;
 import de.simonkerstan.ee.core.test.TestStaticHolder;
 import de.simonkerstan.ee.core.test4.Test4;
+import de.simonkerstan.ee.core.test5.MainClass5;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +37,7 @@ class EeExpressApplicationIntegrationTest {
     }
 
     @Test
-    @DisplayName("There is no default constructor in the test4 package -> Should run the application")
+    @DisplayName("There is a default constructor bean in the test4 package -> Should run the application")
     void testRunWithDefaultConstructor() {
         final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
                                                                              "de.simonkerstan.ee.core.test4");
@@ -65,6 +66,16 @@ class EeExpressApplicationIntegrationTest {
                                                                                  "de.simonkerstan.ee.core.test3"));
         assertTrue(exception.getMessage()
                            .contains("unresolvable dependencies"));
+    }
+
+    @Test
+    @DisplayName("There is no @Inject annotation in the test5 package -> Should run the application")
+    void testRunMainClassWithoutInjectAnnotation() {
+        final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
+                                                                             "de.simonkerstan.ee.core.test5");
+        EeExpressApplication.run(applicationConfiguration);
+        // If the following properties are set, the application was started successfully
+        assertEquals("true", System.getProperty(MainClass5.class.getName()));
     }
 
 }

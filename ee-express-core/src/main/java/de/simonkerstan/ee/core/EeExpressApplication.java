@@ -86,13 +86,7 @@ public final class EeExpressApplication {
         dependencyInjectionHook.postProcess();
 
         // Get the main application class and save it in the application context
-        final var mainClass = mainApplicationHook.getMainApplicationClass();
-        final Runnable mainApplication;
-        if (mainClass != null) {
-            mainApplication = (Runnable) dependencyInjectionHook.getBean(mainClass);
-        } else {
-            mainApplication = null;
-        }
+        final var mainApplication = getMainApplication(mainApplicationHook, dependencyInjectionHook);
 
         // Create the application context
         return new ApplicationContext(configuration, classScanner.getScanPackages(), dependencyInjectionHook.getBeans(),
@@ -108,13 +102,38 @@ public final class EeExpressApplication {
         if (applicationContext.getMainApplication() == null) {
             throw new IllegalStateException("No main application class found or instantiation failed. " //
                                                     + "Is the main application class annotated with " //
-                                                    + "@MainApplication and has one constructor annotated with " //
-                                                    + "@jakarta.inject.Inject?");
+                                                    + "@MainApplication and has either one constructor annotated " //
+                                                    + "with @jakarta.inject.Inject or an accessible default " //
+                                                    + "constructor?");
         }
 
         // Run the main application
         applicationContext.getMainApplication()
                 .run();
+    }
+
+    private static Runnable getMainApplication(MainApplicationHook mainApplicationHook,
+                                               DependencyInjectionHook dependencyInjectionHook) {
+        final var mainClass = mainApplicationHook.getMainApplicationClass();
+        Runnable mainApplication;
+        if (mainClass != null) {
+            // Main application class found, now we try to find an instantiated object or created one
+            mainApplication = (Runnable) dependencyInjectionHook.getBean(mainClass);
+            if (mainApplication == null) {
+                // Not instantiated yet, try to create one
+                try {
+                    mainApplication = (Runnable) mainClass.getDeclaredConstructor()
+                            .newInstance();
+                } catch (Exception e) {
+                    log.error("Cannot instantiate main application class {}", mainClass.getName(), e);
+                }
+            }
+        } else {
+            // No main application class found
+            mainApplication = null;
+        }
+
+        return mainApplication;
     }
 
 }
