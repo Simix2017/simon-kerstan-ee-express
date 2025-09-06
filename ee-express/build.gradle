@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
 repositories {
@@ -23,6 +24,39 @@ publishing {
     publications {
         maven(MavenPublication) {
             from components.java
+            pom {
+                name = 'Simon Kerstan EE Express'
+                description = 'A lightweight and minimal Jakarta EE runtime for Java'
+                url = 'https://github.com/Simix2017/simon-kerstan-ee-express'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/license/mit'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'Simix2017'
+                        name = 'Simon Kerstan'
+                        email = 's.kerstan2018@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/Simix2017/simon-kerstan-ee-express.git'
+                    developerConnection = 'scm:git:ssh://github.com:Simix2017/simon-kerstan-ee-express.git'
+                    url = 'https://github.com/Simix2017/simon-kerstan-ee-express'
+                }
+            }
         }
     }
+    repositories {
+        maven {
+            name = "LocalMavenWithChecksums"
+            url = uri(layout.buildDirectory.dir("staging-deploy"))
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.maven
 }
