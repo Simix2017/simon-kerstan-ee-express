@@ -31,12 +31,15 @@ This project is compatible with Java 17 and above. Currently, the framework is b
 
 ### EE Express
 
+_In development_
+
 This project bundles all web modules of this framework into one dependency. You can use this dependency instead of a
 list of all web modules in your `build.gradle` file.
 
 ### EE Express Core
 
-_Base module_ | [Module documentation](docs/core.md)
+_Base
+module_ | [Module documentation](docs/core.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-core)
 
 Core Jakarta EE runtime with Jakarta EE Dependency Injection and configuration APIs. This can be used for web and
 non-web applications and has APIs for bootstrapping applications. Every other module of the framework is based on this
@@ -57,7 +60,8 @@ The following Jakarta EE (and own) APIs are available inside this module:
 
 ### EE Express Validation
 
-_Universal module_ | [Module documentation](docs/validation.md)
+_Universal
+module_ | [Module documentation](docs/validation.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-validation)
 
 Validation API for Jakarta EE. A configured `Validator` is automatically provided in the CDI context.
 
@@ -67,7 +71,8 @@ The following Jakarta EE APIs are available inside this module:
 
 ### EE Express Web
 
-_Web module_ | [Module documentation](docs/web.md)
+_Web
+module_ | [Module documentation](docs/web.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-web)
 
 Web Jakarta EE runtime with a Servlet container and a JAX-RS runtime. Different to the initialization of standalone
 applications, a server must be created with an initialized application context. This server can be started after adding
