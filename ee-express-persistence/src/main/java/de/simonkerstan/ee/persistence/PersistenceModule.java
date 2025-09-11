@@ -30,6 +30,7 @@ import java.util.List;
  */
 public class PersistenceModule implements FrameworkModule {
 
+    private final EntityClassHook entityClassHook = new EntityClassHook();
     private EntityManagerFactory entityManagerFactory;
 
     @Override
@@ -45,7 +46,8 @@ public class PersistenceModule implements FrameworkModule {
                 // Initialize JPA for default datasource
                 final var defaultDatasource = configuration.getRequiredPropertyValue("persistence.source.default",
                                                                                      JpaDatasourceConfiguration.class);
-                this.entityManagerFactory = HibernateInitializer.init(defaultDatasource, validatorFactory);
+                this.entityManagerFactory = HibernateInitializer.init(defaultDatasource, validatorFactory,
+                                                                      this.entityClassHook.getEntities());
             }
         } catch (MissingConfigurationPropertyException e) {
             throw new IllegalArgumentException("Cannot initialize persistence module without default datasource", e);
@@ -54,7 +56,7 @@ public class PersistenceModule implements FrameworkModule {
 
     @Override
     public List<ClassHook> classHooks() {
-        return List.of();
+        return List.of(this.entityClassHook);
     }
 
     @Override

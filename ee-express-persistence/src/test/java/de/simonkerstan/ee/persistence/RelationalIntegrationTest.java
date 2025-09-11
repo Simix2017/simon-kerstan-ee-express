@@ -6,8 +6,11 @@
 package de.simonkerstan.ee.persistence;
 
 import de.simonkerstan.ee.core.EeExpressApplication;
+import de.simonkerstan.ee.persistence.relational.RelAppStatic;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Integration tests for relational persistence.
@@ -30,6 +33,10 @@ class RelationalIntegrationTest {
                                                                              "de.simonkerstan.ee.persistence" +
                                                                                      ".relational");
         EeExpressApplication.run(applicationConfiguration);
+
+        // Assert results
+        assertEquals("It's me", RelAppStatic.getTestEntity()
+                .getName());
     }
 
 }
