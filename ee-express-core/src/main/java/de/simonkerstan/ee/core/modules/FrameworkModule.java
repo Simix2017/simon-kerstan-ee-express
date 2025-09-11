@@ -24,10 +24,11 @@ public interface FrameworkModule {
     /**
      * Initialize the module. This method will be called after class scanning, so the results of the hooks can be used.
      *
-     * @param configuration Configuration of the framework
-     * @param classpathItem Classpath item (wrapper to access all classpath resources)
+     * @param configuration        Configuration of the framework
+     * @param classpathItem        Classpath item (wrapper to access all classpath resources)
+     * @param beanInstanceProvider Provider for already instantiated beans by framework modules loaded before
      */
-    void init(Configuration configuration, ClasspathItem classpathItem);
+    void init(Configuration configuration, ClasspathItem classpathItem, BeanInstanceProvider beanInstanceProvider);
 
     /**
      * Get all class hooks of this module.
@@ -51,10 +52,17 @@ public interface FrameworkModule {
     List<MethodHook> methodHooks();
 
     /**
-     * Get all bean providers of this module. This method will be called after module initialization.
+     * Get all bean providers of this module. This method will be called after the module is initialized.
      *
      * @return Bean providers
      */
-    List<BeanProvider<?>> beanProviders();
+    List<BeanProvider<?>> afterInitBeanProviders();
+
+    /**
+     * Get all bean providers of this module. This method will be called after class scanning.
+     *
+     * @return Bean providers
+     */
+    List<BeanProvider<?>> afterScanBeanProviders();
 
 }

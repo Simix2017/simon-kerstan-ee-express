@@ -110,3 +110,12 @@ variable `MY_VALUE` is mapped to the configuration property `my.value`.
 
 From the classpath a file named `application.properties` is loaded. This file can be used to set configuration
 properties.
+
+## Configuration resolving
+
+Configuration values can be resolved by giving the target type which leads to automatic type conversion. All primitive
+types and their respective wrappers (and enums) are supported.
+
+Also, records are supported where the fields are mapped to configuration properties. For example, if the record
+`MyRecord` has a field `myValue` and the configuration property `my.value` is set to `123`, the value of `myValue` will
+be `123` if the configuration property `my` is resolved as an instance of `MyRecord`.

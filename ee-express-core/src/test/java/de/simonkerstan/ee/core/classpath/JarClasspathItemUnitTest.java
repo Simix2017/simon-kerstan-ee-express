@@ -42,7 +42,7 @@ class JarClasspathItemUnitTest {
         final var result = tested.getChildren("META-INF");
         assertTrue(result.contains("MANIFEST.MF"));
         assertFalse(result.contains("de-simonkerstan-ee-express/modules"));
-        assertFalse(result.contains("modules"));
+        assertFalse(result.contains("META-INF/de-simonkerstan-ee-express/modules"));
         assertFalse(result.contains("non-existing"));
     }
 

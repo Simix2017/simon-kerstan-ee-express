@@ -11,9 +11,11 @@ import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.di.BeanProvider;
+import de.simonkerstan.ee.core.modules.BeanInstanceProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 import java.util.List;
@@ -25,13 +27,15 @@ import java.util.List;
  */
 public class ValidationModule implements FrameworkModule {
 
+    private ValidatorFactory validatorFactory;
     private Validator validator;
 
     @Override
-    public void init(Configuration configuration, ClasspathItem classpathItem) {
+    public void init(Configuration configuration, ClasspathItem classpathItem,
+                     BeanInstanceProvider beanInstanceProvider) {
         // The validator factory is not closed because the validator instance is reused for the whole application
         // lifetime.
-        final var validatorFactory = Validation.byDefaultProvider()
+        this.validatorFactory = Validation.byDefaultProvider()
                 .configure()
                 .messageInterpolator(new ParameterMessageInterpolator())
                 .buildValidatorFactory();
@@ -54,8 +58,14 @@ public class ValidationModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> beanProviders() {
-        return List.of(new BeanProvider<>(Validator.class, this.validator, Integer.MAX_VALUE));
+    public List<BeanProvider<?>> afterInitBeanProviders() {
+        return List.of(new BeanProvider<>(ValidatorFactory.class, this.validatorFactory, Integer.MAX_VALUE), //
+                       new BeanProvider<>(Validator.class, this.validator, Integer.MAX_VALUE));
+    }
+
+    @Override
+    public List<BeanProvider<?>> afterScanBeanProviders() {
+        return List.of();
     }
 
 }

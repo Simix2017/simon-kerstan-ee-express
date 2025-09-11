@@ -13,21 +13,24 @@ import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.modules.BeanInstanceProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
+import lombok.Getter;
 
 import java.util.List;
 
 /**
- * Test framework module for integration and unit tests. This module will never be instantiated.
+ * Framework module loaded after the others.
  */
-public class TestModule2 implements FrameworkModule {
+public class AfterModule implements FrameworkModule {
 
+    @Getter
     private CoolFrameworkBean coolFrameworkBean;
 
     @Override
     public void init(Configuration configuration, ClasspathItem classpathItem,
                      BeanInstanceProvider beanInstanceProvider) {
-        // If the framework bean is set, the module was properly initialized.
-        this.coolFrameworkBean = new CoolFrameworkBean("Never instantiated bean");
+        // Get bean from a framework module loaded before and throw an exception if not available
+        this.coolFrameworkBean = beanInstanceProvider.getBeanInstance(CoolFrameworkBean.class)
+                .orElseThrow(() -> new IllegalStateException("Bean not available"));
     }
 
     @Override
@@ -47,7 +50,7 @@ public class TestModule2 implements FrameworkModule {
 
     @Override
     public List<BeanProvider<?>> afterInitBeanProviders() {
-        return List.of(new BeanProvider<>(CoolFrameworkBean.class, this.coolFrameworkBean, 0));
+        return List.of();
     }
 
     @Override

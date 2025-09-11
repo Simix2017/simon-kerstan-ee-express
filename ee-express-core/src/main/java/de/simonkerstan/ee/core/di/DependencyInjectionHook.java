@@ -12,6 +12,7 @@ import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.di.graph.DependencyGraph;
 import de.simonkerstan.ee.core.di.graph.ObjectBeanCreationInformation;
+import de.simonkerstan.ee.core.modules.BeanInstanceProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Hook for dependency injection used by the class scanning mechanism.
@@ -30,7 +28,8 @@ import java.util.Map;
  * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 @Slf4j
-public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, ConstructorHook, MethodHook {
+public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, ConstructorHook, MethodHook,
+        BeanInstanceProvider {
 
     private final Map<Class<?>, Object> beans = new HashMap<>();
 
@@ -38,6 +37,10 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
      * Map of all unprocessed beans. (concrete implementation class -> bean information)
      */
     private final Map<Class<?>, BeanInformation> unprocessedBeans = new HashMap<>();
+    /**
+     * Map of all beans created by framework modules in the loading mechanism. (type -> bean instance)
+     */
+    private final Map<Class<?>, Object> frameworkModuleBeans = new HashMap<>();
     private final DependencyGraph dependencyGraph = new DependencyGraph();
 
     /*
@@ -112,6 +115,13 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
 
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Optional<T> getBeanInstance(Class<T> type) {
+        // This method is used in the framework module loading mechanism to get all created beans from other modules.
+        return Optional.ofNullable((T) this.frameworkModuleBeans.get(type));
+    }
+
     /**
      * Add a bean provider from a framework module.
      *
@@ -120,6 +130,8 @@ public class DependencyInjectionHook implements ClassHook, ClassInterfacesHook, 
     public void addBeanProvider(BeanProvider<?> beanProvider) {
         final var beanCreationInformation = new ObjectBeanCreationInformation(beanProvider.instance());
         this.dependencyGraph.addBean(beanProvider.priority(), beanProvider.type(), beanCreationInformation);
+        // Add the bean to the framework module map to be retrieved later in {@link #getBeanInstance(Class)}
+        this.frameworkModuleBeans.put(beanProvider.type(), beanProvider.instance());
     }
 
     /**

@@ -22,7 +22,8 @@ Also, you are free to contribute code to the software. Please follow some easy r
 3. Work in a new branch either named `feature/xxx` (features) or `hotfix/xxx` (bugs).
 4. Follow the [coding guidelines](#coding-guidelines).
 5. Write [unit tests](#unit-tests) (if necessary) and [integration tests](#integration-tests).
-6. Update the [changelog](CHANGELOG.md).
+6. Update the [changelog](CHANGELOG.md). Please note that the changelog only contains changes for public APIs and no
+   internal changes.
 7. Create a pull request for your created branch against the main branch.
 8. Be friendly and open for feedback from other developers and maintainers.
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- EE Express Persistence (Jakarta EE Persistence, Jakarta EE Data and Redis support)
+- Configuration parsing for record types
+- Missing primitive types to the configuration parsing mechanism
+
 ### Changed
 
 - Made `de.simonkerstan:ee-express` publishable via Maven Central.

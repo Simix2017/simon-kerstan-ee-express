@@ -76,11 +76,15 @@ public final class EeExpressApplication {
         classScanner.scan();
 
         // Initialize all framework modules (already sorted by priority)
-        modules.forEach(module -> module.init(configuration, classpathItem));
+        modules.forEach(module -> {
+            module.init(configuration, classpathItem, dependencyInjectionHook);
+            module.afterInitBeanProviders()
+                    .forEach(dependencyInjectionHook::addBeanProvider);
+        });
 
         // Create all beans and set up the CDI context
         modules.stream()
-                .map(FrameworkModule::beanProviders)
+                .map(FrameworkModule::afterScanBeanProviders)
                 .flatMap(List::stream)
                 .forEach(dependencyInjectionHook::addBeanProvider);
         dependencyInjectionHook.postProcess();

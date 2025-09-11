@@ -11,6 +11,7 @@ import de.simonkerstan.ee.core.clazz.ConstructorHook;
 import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.configuration.Configuration;
 import de.simonkerstan.ee.core.di.BeanProvider;
+import de.simonkerstan.ee.core.modules.BeanInstanceProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public class TestModule implements FrameworkModule {
     private CoolFrameworkBean coolFrameworkBean;
 
     @Override
-    public void init(Configuration configuration, ClasspathItem classpathItem) {
+    public void init(Configuration configuration, ClasspathItem classpathItem,
+                     BeanInstanceProvider beanInstanceProvider) {
         // If the framework bean is set, the module was properly initialized.
         this.coolFrameworkBean = new CoolFrameworkBean("CoolFrameworkBean");
     }
@@ -44,8 +46,13 @@ public class TestModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> beanProviders() {
+    public List<BeanProvider<?>> afterInitBeanProviders() {
         return List.of(new BeanProvider<>(CoolFrameworkBean.class, this.coolFrameworkBean, 0));
+    }
+
+    @Override
+    public List<BeanProvider<?>> afterScanBeanProviders() {
+        return List.of();
     }
 
 }

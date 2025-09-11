@@ -1,0 +1,26 @@
+# EE Express Persistence module
+
+This module provides persistence with relational databases and distributed cache support (Redis).
+
+## Datasource configuration
+
+Per default, a datasource named `default` must be configured for the persistence module to work.
+
+## Configuration
+
+This module provides the following configuration parameters:
+
+| Parameter                                  | Description                                     | Default value | Possible values   |
+|--------------------------------------------|-------------------------------------------------|---------------|-------------------|
+| `persistence.source.@NAME@.url`            | Datasource URL                                  | -             |                   |
+| `persistence.source.@NAME@.username`       | Datasource Username                             | -             |                   |
+| `persistence.source.@NAME@.password`       | Datasource Password                             | -             |                   |
+| `persistence.source.@NAME@.driverName`     | Datasource driver name (for relational sources) | -             |                   |
+| `persistence.source.@NAME@.type`           | Datasource type                                 | -             | RELATIONAL, REDIS |
+| `persistence.source.@NAME@.schemaStrategy` | Schema strategy (for relational sources)        | -             | CREATE            |
+
+For more information about how to set the configuration parameters, see the [configuration API](core/configuration.md).
+
+## Support for relational databases
+
+Your using application project must include the used JDBC database driver in the runtime classpath.

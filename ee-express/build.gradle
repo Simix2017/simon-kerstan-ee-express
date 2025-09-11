@@ -1,15 +1,10 @@
-plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id 'signing'
-}
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     api project(':ee-express-core')
+    api project(':ee-express-persistence')
     api project(':ee-express-validation')
     api project(':ee-express-web')
 }

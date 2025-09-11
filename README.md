@@ -27,19 +27,24 @@ If you want to contribute to this project, please read the [contributing guideli
 This project is compatible with Java 17 and above. Currently, the framework is based on
 [Jakarta EE Platform 11](https://jakarta.ee/specifications/platform/11/).
 
-## Projects
+## Modules
+
+Modules which are defined as "in development" are not yet available on Maven Central, but you can build them yourself
+with `./gradlew clean build`.
 
 ### EE Express
 
 _In development_
+
+Web module | [Maven Central](https://central.sonatype.org/artifact/de.simonkerstan/ee-express)
 
 This project bundles all web modules of this framework into one dependency. You can use this dependency instead of a
 list of all web modules in your `build.gradle` file.
 
 ### EE Express Core
 
-_Base
-module_ | [Module documentation](docs/core.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-core)
+Base
+module | [Module documentation](docs/core.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-core)
 
 Core Jakarta EE runtime with Jakarta EE Dependency Injection and configuration APIs. This can be used for web and
 non-web applications and has APIs for bootstrapping applications. Every other module of the framework is based on this
@@ -58,10 +63,24 @@ The following Jakarta EE (and own) APIs are available inside this module:
 - [SLF4J](https://slf4j.org/)
 - [Configuration API](docs/core/configuration.md)
 
+### EE Express Persistence
+
+_In development_
+
+Universal
+module | [Module documentation](docs/persistence.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-validation)
+
+This module provides persistence with relational databases and distributed cache support (Redis).
+
+The following Jakarta EE APIs are available inside this module:
+
+- [Jakarta Data 1.0](https://jakarta.ee/specifications/data/1.0/)
+- [Jakarta Persistence 3.2](https://jakarta.ee/specifications/persistence/3.2/)
+
 ### EE Express Validation
 
-_Universal
-module_ | [Module documentation](docs/validation.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-validation)
+Universal
+module | [Module documentation](docs/validation.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-validation)
 
 Validation API for Jakarta EE. A configured `Validator` is automatically provided in the CDI context.
 
@@ -71,8 +90,8 @@ The following Jakarta EE APIs are available inside this module:
 
 ### EE Express Web
 
-_Web
-module_ | [Module documentation](docs/web.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-web)
+Web
+module | [Module documentation](docs/web.md) | [Maven Central](https://central.sonatype.com/artifact/de.simonkerstan/ee-express-web)
 
 Web Jakarta EE runtime with a Servlet container and a JAX-RS runtime. Different to the initialization of standalone
 applications, a server must be created with an initialized application context. This server can be started after adding

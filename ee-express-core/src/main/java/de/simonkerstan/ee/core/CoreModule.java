@@ -12,6 +12,7 @@ import de.simonkerstan.ee.core.clazz.MethodHook;
 import de.simonkerstan.ee.core.configuration.*;
 import de.simonkerstan.ee.core.di.BeanProvider;
 import de.simonkerstan.ee.core.exceptions.InvalidConfigurationSourceException;
+import de.simonkerstan.ee.core.modules.BeanInstanceProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 
 import java.io.IOException;
@@ -28,7 +29,8 @@ public class CoreModule implements FrameworkModule {
     private Configuration configuration;
 
     @Override
-    public void init(Configuration configuration, ClasspathItem classpathItem) {
+    public void init(Configuration configuration, ClasspathItem classpathItem,
+                     BeanInstanceProvider beanInstanceProvider) {
         this.configuration = configuration;
 
         if (configuration instanceof DefaultConfiguration defaultConfiguration) {
@@ -76,8 +78,13 @@ public class CoreModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> beanProviders() {
+    public List<BeanProvider<?>> afterInitBeanProviders() {
         return List.of(new BeanProvider<>(Configuration.class, this.configuration, Integer.MAX_VALUE));
+    }
+
+    @Override
+    public List<BeanProvider<?>> afterScanBeanProviders() {
+        return List.of();
     }
 
 }
