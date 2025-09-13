@@ -27,10 +27,21 @@ If you want to contribute to this project, please read the [contributing guideli
 This project is compatible with Java 17 and above. Currently, the framework is based on
 [Jakarta EE Platform 11](https://jakarta.ee/specifications/platform/11/).
 
+## Build
+
+This project uses [Gradle](https://gradle.org/) as a build tool. To build the project, you can use the following
+command: `./gradlew clean build`.
+
+Because Maven Central requires signed builds, the `signing` plugin in Gradle is activated. To sign the artifacts, you
+need to provide your GPG key and password as Gradle properties. You could use the following command to sign the
+artifacts: `./gradlew clean build -Psigning.keyId=<KEYID> -Psigning.password= \
+-Psigning.secretKeyRingFile=<KEYRING_FILE>`.
+
+For snapshots, the signing plugin is deactivated.
+
 ## Modules
 
-Modules which are defined as "in development" are not yet available on Maven Central, but you can build them yourself
-with `./gradlew clean build`.
+Modules which are defined as "in development" are not yet available on Maven Central, but you can build them yourself.
 
 ### EE Express
 
