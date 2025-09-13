@@ -7,6 +7,7 @@ package de.simonkerstan.ee.core.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -26,6 +27,16 @@ public final class PropertiesFileConfigurationProvider implements ConfigurationP
     @Override
     public Optional<String> getConfigurationValue(String propertyName) {
         return Optional.ofNullable(this.properties.getProperty(propertyName));
+    }
+
+    @Override
+    public Optional<List<String>> getConfigurationSubValues(String propertyName) {
+        return Optional.of(this.properties.stringPropertyNames()
+                                   .stream()
+                                   .filter(name -> name.startsWith(propertyName + "."))
+                                   .map(name -> name.substring(propertyName.length() + 1))
+                                   .map(name -> name.split("\\.")[0])
+                                   .toList());
     }
 
 }

@@ -6,6 +6,7 @@
 package de.simonkerstan.ee.core.configuration;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -58,6 +59,11 @@ final class CommandLineConfigurationProvider implements ConfigurationProvider {
     @Override
     public Optional<String> getConfigurationValue(String propertyName) {
         return Optional.ofNullable(this.configurationValues.get(propertyName));
+    }
+
+    @Override
+    public Optional<List<String>> getConfigurationSubValues(String propertyName) {
+        return Optional.empty();
     }
 
 }

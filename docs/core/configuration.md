@@ -43,6 +43,13 @@ public class MyService {
 There are different layers that are used to retrieve the configuration properties. See the sections below for more
 details.
 
+## Configuration parameters used to resolve some configuration sources
+
+| Parameter                             | Description                                                                    | Default value |
+|---------------------------------------|--------------------------------------------------------------------------------|---------------|
+| `core.configuration.properties.files` | Properties files used as configuration file sources (semicolon-separated list) | <empty>       |
+| `core.configuration.xml.files`        | XML files used as configuration file sources (semicolon-separated list)        | <empty>       |
+
 ## Configuration sources
 
 There are different sources of configuration that are loaded in the following order (the highest priority first):
@@ -93,12 +100,27 @@ public class MyConfigurationProvider implements ConfigurationProvider {
         return Optional.empty();
     }
 
+    @Override
+    public Optional<List<String>> getConfigurationSubValues(String propertyName) {
+        return Optional.empty();
+    }
+
 }
 ```
 
 ### Configured other configuration files
 
-TODO: add handling of configuration files
+In the
+section [Configuration parameters used to resolve some configuration sources](#configuration-parameters-used-to-resolve-some-configuration-sources)
+there are configuration parameters that can be used to configure the configuration file sources.
+
+#### Properties files
+
+Properties files are loaded from the configured files and can be used to set configuration properties.
+
+#### XML files
+
+TODO: Add XML support
 
 ### Environment variables
 
@@ -119,3 +141,10 @@ types and their respective wrappers (and enums) are supported.
 Also, records are supported where the fields are mapped to configuration properties. For example, if the record
 `MyRecord` has a field `myValue` and the configuration property `my.value` is set to `123`, the value of `myValue` will
 be `123` if the configuration property `my` is resolved as an instance of `MyRecord`.
+
+### Lists and maps of configuration values
+
+Only custom and configuration file sources support lists and maps of configuration values. You can use special methods
+of the `Configuration` interface/bean to retrieve lists and maps of configuration values. Different to other types,
+lists and maps are combined from all compatible sources. If the same key in a map exists in multiple sources, the
+value from the first source is used (just like for any other type).

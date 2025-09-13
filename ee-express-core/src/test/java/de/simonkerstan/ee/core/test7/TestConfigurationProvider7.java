@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package de.simonkerstan.ee.core.test;
+package de.simonkerstan.ee.core.test7;
 
 import de.simonkerstan.ee.core.annotations.ConfigurationSource;
 import de.simonkerstan.ee.core.configuration.ConfigurationProvider;
@@ -15,12 +15,14 @@ import java.util.Optional;
  * Configuration provider test implementation for integration tests.
  */
 @ConfigurationSource
-public class TestConfigurationProvider implements ConfigurationProvider {
+public class TestConfigurationProvider7 implements ConfigurationProvider {
 
     @Override
     public Optional<String> getConfigurationValue(String propertyName) {
-        if ("my_property".equals(propertyName)) {
-            return Optional.of("Cool ;)");
+        if ("my_sub_property.sub_value_1".equals(propertyName)) {
+            return Optional.of("VALUE1");
+        } else if ("my_sub_property.sub_value_2".equals(propertyName)) {
+            return Optional.of("VALUE2");
         }
 
         return Optional.empty();
@@ -28,7 +30,11 @@ public class TestConfigurationProvider implements ConfigurationProvider {
 
     @Override
     public Optional<List<String>> getConfigurationSubValues(String propertyName) {
-        return Optional.of(List.of());
+        if ("my_sub_property".equals(propertyName)) {
+            return Optional.of(List.of("sub_value_1", "sub_value_2"));
+        }
+
+        return Optional.empty();
     }
 
 }

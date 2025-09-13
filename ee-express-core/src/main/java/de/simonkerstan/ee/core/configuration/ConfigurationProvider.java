@@ -5,6 +5,7 @@
 
 package de.simonkerstan.ee.core.configuration;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,5 +20,13 @@ public interface ConfigurationProvider {
      * @return Value of the property or empty if the property is missing
      */
     Optional<String> getConfigurationValue(String propertyName);
+
+    /**
+     * Get the sub values of a configuration property (e.g., map keys or list elements).
+     *
+     * @param propertyName Name of the property
+     * @return Sub values of the property or empty if the property is missing or lists and maps are not supported
+     */
+    Optional<List<String>> getConfigurationSubValues(String propertyName);
 
 }

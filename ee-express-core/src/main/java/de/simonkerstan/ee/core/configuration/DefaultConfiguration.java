@@ -9,7 +9,9 @@ import de.simonkerstan.ee.core.exceptions.MissingConfigurationPropertyException;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Default configuration implementation.
@@ -59,6 +61,43 @@ public final class DefaultConfiguration implements Configuration {
                 .orElseThrow(() -> new MissingConfigurationPropertyException(propertyName));
     }
 
+    @Override
+    public <T> Optional<List<T>> getListValue(String propertyName, Class<T> type) {
+        return this.getSubValues(propertyName)
+                .map(list -> list.stream()
+                        .map(property -> "%s.%s".formatted(propertyName, property))
+                        .map(property -> this.getPropertyValue(property, type))
+                        .flatMap(Optional::stream)
+                        .toList());
+    }
+
+    @Override
+    public <T> List<T> getRequiredListValue(String propertyName, Class<T> type) throws
+            MissingConfigurationPropertyException {
+        return this.getListValue(propertyName, type)
+                .orElseThrow(() -> new MissingConfigurationPropertyException(propertyName));
+    }
+
+    @Override
+    public <T> Optional<Map<String, T>> getMapValue(String propertyName, Class<T> type) {
+        return this.getSubValues(propertyName)
+                .map(list -> list.stream()
+                        .map(property -> {
+                            final var key = "%s.%s".formatted(propertyName, property);
+                            final var value = this.getPropertyValue(key, type)
+                                    .orElseThrow();
+                            return Map.entry(property, value);
+                        })
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    @Override
+    public <T> Map<String, T> getRequiredMapValue(String propertyName, Class<T> type) throws
+            MissingConfigurationPropertyException {
+        return this.getMapValue(propertyName, type)
+                .orElseThrow(() -> new MissingConfigurationPropertyException(propertyName));
+    }
+
     /**
      * Add a configuration provider.
      *
@@ -66,6 +105,28 @@ public final class DefaultConfiguration implements Configuration {
      */
     public void addConfigurationProvider(ConfigurationProvider provider) {
         this.providers.add(provider);
+    }
+
+    /**
+     * Get all sub values for the given property name (by using all providers).
+     *
+     * @param propertyName Property name
+     * @return Sub values or empty if no sub values are available
+     */
+    private Optional<List<String>> getSubValues(String propertyName) {
+        final var safeProvidersList = this.providers.stream()
+                .map(provider -> provider.getConfigurationSubValues(propertyName))
+                .filter(Optional::isPresent)
+                .toList();
+        if (safeProvidersList.isEmpty()) {
+            // No provider supports sub values
+            return Optional.empty();
+        }
+
+        return Optional.of(safeProvidersList.stream()
+                                   .flatMap(Optional::stream)
+                                   .flatMap(List::stream)
+                                   .toList());
     }
 
 }

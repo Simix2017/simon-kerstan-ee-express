@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +30,11 @@ class PropertiesFileConfigurationProviderUnitTest {
                     .orElse(""));
             assertTrue(tested.getConfigurationValue("non_existing")
                                .isEmpty());
+
+            final var list = tested.getConfigurationSubValues("cool.example.sub");
+            assertArrayEquals(List.of("x", "y")
+                                      .toArray(), list.orElseThrow()
+                                      .toArray());
         }
     }
 

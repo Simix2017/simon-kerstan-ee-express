@@ -5,12 +5,13 @@
 
 package de.simonkerstan.ee.core.configuration;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * Configuration properties from environment variables (automatically loaded by the JVM).
  */
-public class EnvironmentConfigurationProvider implements ConfigurationProvider {
+public final class EnvironmentConfigurationProvider implements ConfigurationProvider {
 
     /*
     There is no unit test because Mockito cannot mock System.getenv().
@@ -20,6 +21,11 @@ public class EnvironmentConfigurationProvider implements ConfigurationProvider {
     public Optional<String> getConfigurationValue(String propertyName) {
         return Optional.ofNullable(System.getenv(propertyName.toUpperCase()
                                                          .replace('.', '_')));
+    }
+
+    @Override
+    public Optional<List<String>> getConfigurationSubValues(String propertyName) {
+        return Optional.empty();
     }
 
 }

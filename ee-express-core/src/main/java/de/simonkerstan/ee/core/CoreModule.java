@@ -16,7 +16,9 @@ import de.simonkerstan.ee.core.modules.BeanInstanceProvider;
 import de.simonkerstan.ee.core.modules.FrameworkModule;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Core framework module.
@@ -24,6 +26,8 @@ import java.util.List;
  * FOR INTERNAL USE ONLY. THE API CAN CHANGE AT ANY TIME.
  */
 public class CoreModule implements FrameworkModule {
+
+    private static final String PROPERTIES_FILES_KEY = "core.configuration.properties.files";
 
     private final ConfigurationSourceHook configurationSourceHook = new ConfigurationSourceHook();
     private Configuration configuration;
@@ -43,6 +47,16 @@ public class CoreModule implements FrameworkModule {
 
             // Add custom sources (third source)
             this.configurationSourceHook.getConfigurationSources()
+                    .forEach(defaultConfiguration::addConfigurationProvider);
+
+            // Add configuration files (fourth source)
+            // Properties files
+            Arrays.stream(this.configuration.getPropertyValue(PROPERTIES_FILES_KEY, String.class, "")
+                                  .split(";"))
+                    .map(String::trim)
+                    .map(filename -> ConfigurationFileLoader.loadProvider(PropertiesFileConfigurationProvider.class,
+                                                                          filename))
+                    .flatMap(Optional::stream)
                     .forEach(defaultConfiguration::addConfigurationProvider);
 
             // Add environment variables (fifth source)

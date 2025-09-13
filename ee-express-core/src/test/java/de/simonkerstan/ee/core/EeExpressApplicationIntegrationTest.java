@@ -9,8 +9,12 @@ import de.simonkerstan.ee.core.exceptions.BeanInstantiationException;
 import de.simonkerstan.ee.core.test.TestStaticHolder;
 import de.simonkerstan.ee.core.test4.Test4;
 import de.simonkerstan.ee.core.test5.MainClass5;
+import de.simonkerstan.ee.core.test7.Test7;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,6 +90,25 @@ class EeExpressApplicationIntegrationTest {
                                                                                  "de.simonkerstan.ee.core.test6"));
         assertTrue(exception.getMessage()
                            .contains("Cyclic dependency detected"));
+    }
+
+    @Test
+    @DisplayName("There is a test class with configuration in the test7 package -> Should parse the configuration")
+    void testConfigurationPropertiesHandling() {
+        System.setProperty("core.configuration.properties.files", "src/test/resources/test7/test7.properties");
+
+        final var applicationConfiguration = EeExpressApplication.initialize(new String[]{},
+                                                                             "de.simonkerstan.ee.core.test7");
+        EeExpressApplication.run(applicationConfiguration);
+        // If the following properties are set, the configuration was read successfully
+        assertArrayEquals(List.of("VALUE1", "VALUE2")
+                                  .toArray(), Test7.getTestList()
+                                  .toArray());
+        assertEquals(Map.ofEntries(Map.entry("sub_value_1", "VALUE1"), Map.entry("sub_value_2", "VALUE2"))
+                             .entrySet(), Test7.getTestMap()
+                             .entrySet());
+
+        assertEquals("Hello World!", Test7.getXyzFromPropertiesFile());
     }
 
 }
