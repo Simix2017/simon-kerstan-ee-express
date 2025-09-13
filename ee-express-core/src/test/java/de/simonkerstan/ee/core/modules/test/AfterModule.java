@@ -49,12 +49,7 @@ public class AfterModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> afterInitBeanProviders() {
-        return List.of();
-    }
-
-    @Override
-    public List<BeanProvider<?>> afterScanBeanProviders() {
+    public List<BeanProvider<?>> beanProviders() {
         return List.of();
     }
 

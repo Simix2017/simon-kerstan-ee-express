@@ -10,11 +10,8 @@ import de.simonkerstan.ee.core.classpath.ClasspathResolver;
 import de.simonkerstan.ee.core.clazz.ClassScanner;
 import de.simonkerstan.ee.core.configuration.DefaultConfiguration;
 import de.simonkerstan.ee.core.di.DependencyInjectionHook;
-import de.simonkerstan.ee.core.modules.FrameworkModule;
 import de.simonkerstan.ee.core.modules.FrameworkModuleLoader;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 /**
  * Main application initializer.
@@ -78,15 +75,11 @@ public final class EeExpressApplication {
         // Initialize all framework modules (already sorted by priority)
         modules.forEach(module -> {
             module.init(configuration, classpathItem, dependencyInjectionHook);
-            module.afterInitBeanProviders()
+            module.beanProviders()
                     .forEach(dependencyInjectionHook::addBeanProvider);
         });
 
         // Create all beans and set up the CDI context
-        modules.stream()
-                .map(FrameworkModule::afterScanBeanProviders)
-                .flatMap(List::stream)
-                .forEach(dependencyInjectionHook::addBeanProvider);
         dependencyInjectionHook.postProcess();
 
         // Get the main application class and save it in the application context

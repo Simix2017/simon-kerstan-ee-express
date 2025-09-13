@@ -58,14 +58,9 @@ public class ValidationModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> afterInitBeanProviders() {
+    public List<BeanProvider<?>> beanProviders() {
         return List.of(new BeanProvider<>(ValidatorFactory.class, this.validatorFactory, Integer.MAX_VALUE), //
                        new BeanProvider<>(Validator.class, this.validator, Integer.MAX_VALUE));
-    }
-
-    @Override
-    public List<BeanProvider<?>> afterScanBeanProviders() {
-        return List.of();
     }
 
 }

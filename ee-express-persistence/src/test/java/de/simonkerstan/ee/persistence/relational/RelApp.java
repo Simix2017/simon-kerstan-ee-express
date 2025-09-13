@@ -15,10 +15,12 @@ import jakarta.persistence.EntityTransaction;
 public class RelApp implements Runnable {
 
     private final EntityManagerFactory entityManagerFactory;
+    private final TestRepository testRepository;
 
     @Inject
-    public RelApp(EntityManagerFactory entityManagerFactory) {
+    public RelApp(EntityManagerFactory entityManagerFactory, TestRepository testRepository) {
         this.entityManagerFactory = entityManagerFactory;
+        this.testRepository = testRepository;
     }
 
     @Override
@@ -38,6 +40,8 @@ public class RelApp implements Runnable {
             }
             throw e;
         }
+
+        RelAppStatic.setTestEntity2(this.testRepository.findById(1L));
     }
 
 }

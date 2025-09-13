@@ -37,6 +37,8 @@ class RelationalIntegrationTest {
         // Assert results
         assertEquals("It's me", RelAppStatic.getTestEntity()
                 .getName());
+        assertEquals("It's me", RelAppStatic.getTestEntity2()
+                .getName());
     }
 
 }

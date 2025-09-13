@@ -46,13 +46,8 @@ public class TestModule2 implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> afterInitBeanProviders() {
+    public List<BeanProvider<?>> beanProviders() {
         return List.of(new BeanProvider<>(CoolFrameworkBean.class, this.coolFrameworkBean, 0));
-    }
-
-    @Override
-    public List<BeanProvider<?>> afterScanBeanProviders() {
-        return List.of();
     }
 
 }

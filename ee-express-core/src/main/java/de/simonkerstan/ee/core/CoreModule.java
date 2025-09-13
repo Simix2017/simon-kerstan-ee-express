@@ -78,13 +78,8 @@ public class CoreModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> afterInitBeanProviders() {
+    public List<BeanProvider<?>> beanProviders() {
         return List.of(new BeanProvider<>(Configuration.class, this.configuration, Integer.MAX_VALUE));
-    }
-
-    @Override
-    public List<BeanProvider<?>> afterScanBeanProviders() {
-        return List.of();
     }
 
 }

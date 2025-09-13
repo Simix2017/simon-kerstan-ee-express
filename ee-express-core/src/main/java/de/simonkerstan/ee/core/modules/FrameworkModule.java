@@ -52,17 +52,11 @@ public interface FrameworkModule {
     List<MethodHook> methodHooks();
 
     /**
-     * Get all bean providers of this module. This method will be called after the module is initialized.
+     * Get all bean providers of this module. This method will be called after the module is initialized and all
+     * classes are scanned.
      *
      * @return Bean providers
      */
-    List<BeanProvider<?>> afterInitBeanProviders();
-
-    /**
-     * Get all bean providers of this module. This method will be called after class scanning.
-     *
-     * @return Bean providers
-     */
-    List<BeanProvider<?>> afterScanBeanProviders();
+    List<BeanProvider<?>> beanProviders();
 
 }

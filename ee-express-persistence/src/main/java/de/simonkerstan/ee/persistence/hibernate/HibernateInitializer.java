@@ -6,7 +6,6 @@
 package de.simonkerstan.ee.persistence.hibernate;
 
 import de.simonkerstan.ee.persistence.configuration.JpaDatasourceConfiguration;
-import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.ValidatorFactory;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -23,8 +22,16 @@ public final class HibernateInitializer {
     private HibernateInitializer() {
     }
 
-    public static EntityManagerFactory init(JpaDatasourceConfiguration datasource, ValidatorFactory validatorFactory,
-                                            List<Class<?>> entities) {
+    /**
+     * Initialize Hibernate for a datasource.
+     *
+     * @param datasource       Datasource configuration
+     * @param validatorFactory Validator factory to be used for validation
+     * @param entities         Entities to be registered in Hibernate
+     * @return Initialization result
+     */
+    public static HibernateInitResult init(JpaDatasourceConfiguration datasource, ValidatorFactory validatorFactory,
+                                           List<Class<?>> entities) {
         // Configure the service registry (from Hibernate)
         final var standardServiceRegistryBuilder = new StandardServiceRegistryBuilder();
         configureDatasource(standardServiceRegistryBuilder, datasource);
@@ -36,7 +43,9 @@ public final class HibernateInitializer {
         entities.forEach(metadataSources::addAnnotatedClass);
         final var sessionFactory = metadataSources.buildMetadata()
                 .buildSessionFactory();
-        return sessionFactory;
+        // Create a stateless statelessSession
+        final var statelessSession = sessionFactory.openStatelessSession();
+        return new HibernateInitResult(sessionFactory, statelessSession);
     }
 
     private static void configureDatasource(StandardServiceRegistryBuilder standardServiceRegistryBuilder,

@@ -14,6 +14,10 @@ public final class RelAppStatic {
     @Setter
     private static TestEntity testEntity;
 
+    @Getter
+    @Setter
+    private static TestEntity testEntity2;
+
     private RelAppStatic() {
     }
 

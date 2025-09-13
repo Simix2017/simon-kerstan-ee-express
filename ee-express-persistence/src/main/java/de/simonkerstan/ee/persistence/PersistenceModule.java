@@ -19,6 +19,7 @@ import de.simonkerstan.ee.persistence.configuration.JpaDatasourceConfiguration;
 import de.simonkerstan.ee.persistence.hibernate.HibernateInitializer;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.ValidatorFactory;
+import org.hibernate.StatelessSession;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ public class PersistenceModule implements FrameworkModule {
 
     private final EntityClassHook entityClassHook = new EntityClassHook();
     private EntityManagerFactory entityManagerFactory;
+    private StatelessSession statelessSession;
 
     @Override
     public void init(Configuration configuration, ClasspathItem classpathItem,
@@ -46,8 +48,10 @@ public class PersistenceModule implements FrameworkModule {
                 // Initialize JPA for default datasource
                 final var defaultDatasource = configuration.getRequiredPropertyValue("persistence.source.default",
                                                                                      JpaDatasourceConfiguration.class);
-                this.entityManagerFactory = HibernateInitializer.init(defaultDatasource, validatorFactory,
-                                                                      this.entityClassHook.getEntities());
+                final var initResult = HibernateInitializer.init(defaultDatasource, validatorFactory,
+                                                                 this.entityClassHook.getEntities());
+                this.entityManagerFactory = initResult.entityManagerFactory();
+                this.statelessSession = initResult.statelessSession();
             }
         } catch (MissingConfigurationPropertyException e) {
             throw new IllegalArgumentException("Cannot initialize persistence module without default datasource", e);
@@ -70,17 +74,16 @@ public class PersistenceModule implements FrameworkModule {
     }
 
     @Override
-    public List<BeanProvider<?>> afterInitBeanProviders() {
-        return List.of();
-    }
-
-    @Override
-    public List<BeanProvider<?>> afterScanBeanProviders() {
+    public List<BeanProvider<?>> beanProviders() {
         final List<BeanProvider<?>> beanProviders = new LinkedList<>();
         if (this.entityManagerFactory != null) {
             // Add entity manager factory as bean provider
             beanProviders.add(
                     new BeanProvider<>(EntityManagerFactory.class, this.entityManagerFactory, Integer.MAX_VALUE));
+        }
+        if (this.statelessSession != null) {
+            // Add stateless session as bean provider
+            beanProviders.add(new BeanProvider<>(StatelessSession.class, this.statelessSession, Integer.MAX_VALUE));
         }
 
         return beanProviders;

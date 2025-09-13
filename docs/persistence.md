@@ -2,10 +2,6 @@
 
 This module provides persistence with relational databases and distributed cache support (Redis).
 
-## Datasource configuration
-
-Per default, a datasource named `default` must be configured for the persistence module to work.
-
 ## Configuration
 
 This module provides the following configuration parameters:
@@ -21,6 +17,9 @@ This module provides the following configuration parameters:
 
 For more information about how to set the configuration parameters, see the [configuration API](core/configuration.md).
 
+Please note: a datasource named `default` must be configured for the persistence module to work.
+
 ## Support for relational databases
 
-Your using application project must include the used JDBC database driver in the runtime classpath.
+Your using application project must include the used JDBC database driver in the runtime classpath. Also, relational
+support with Jakarta Data is currently only implemented for the default datasource.
